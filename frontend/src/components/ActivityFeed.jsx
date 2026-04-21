@@ -1,13 +1,18 @@
 import { Card, CardContent, CardHeader, Avatar, AvatarFallback } from '@heroui/react'
 import { activityFeed } from '../data/mockData'
+import { useI18n } from '../i18n/context'
 
 export default function ActivityFeed() {
+  const { t } = useI18n()
+
   return (
     <Card className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
       <CardHeader className="px-5 pt-5 pb-0">
         <div>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-white">Activity</p>
-          <p className="text-xs text-zinc-400">Recent events</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+            {t.activityFeed.title}
+          </p>
+          <p className="text-xs text-zinc-400">{t.activityFeed.subtitle}</p>
         </div>
       </CardHeader>
       <CardContent className="px-5 pb-5 flex flex-col gap-3">
@@ -18,7 +23,8 @@ export default function ActivityFeed() {
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-zinc-700 dark:text-zinc-300">
-                <span className="font-semibold">{item.user}</span> {item.action}
+                <span className="font-semibold">{item.user}</span>{' '}
+                {t.activityActions[item.actionKey]}
               </p>
               <p className="text-[10px] text-zinc-400 mt-0.5">{item.time}</p>
             </div>

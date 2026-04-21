@@ -1,8 +1,8 @@
 export const stats = [
-  { label: 'Total Revenue', value: '$48,295', change: '+12.5%', trend: 'up', icon: '💰' },
-  { label: 'Active Users', value: '3,842', change: '+8.1%', trend: 'up', icon: '👥' },
-  { label: 'Orders', value: '1,257', change: '-2.4%', trend: 'down', icon: '📦' },
-  { label: 'Conversion', value: '4.63%', change: '+0.8%', trend: 'up', icon: '📈' },
+  { labelKey: 'totalRevenue', value: '$48,295', change: '+12.5%', trend: 'up', icon: '💰' },
+  { labelKey: 'activeUsers', value: '3,842', change: '+8.1%', trend: 'up', icon: '👥' },
+  { labelKey: 'orders', value: '1,257', change: '-2.4%', trend: 'down', icon: '📦' },
+  { labelKey: 'conversion', value: '4.63%', change: '+0.8%', trend: 'up', icon: '📈' },
 ]
 
 export const recentOrders = [
@@ -27,11 +27,11 @@ export const topProducts = [
 ]
 
 export const activityFeed = [
-  { user: 'Alice J.', action: 'upgraded to Pro Plan', time: '2m ago', avatar: 'AJ' },
-  { user: 'System', action: 'backup completed successfully', time: '15m ago', avatar: '🔧' },
-  { user: 'Bob M.', action: 'submitted a support ticket', time: '1h ago', avatar: 'BM' },
-  { user: 'Carol W.', action: 'renewed Enterprise license', time: '3h ago', avatar: 'CW' },
-  { user: 'David L.', action: 'payment failed — retry needed', time: '5h ago', avatar: 'DL' },
+  { user: 'Alice J.', actionKey: 'upgradedToPro', time: '2m ago', avatar: 'AJ' },
+  { user: 'System', actionKey: 'backupCompleted', time: '15m ago', avatar: '🔧' },
+  { user: 'Bob M.', actionKey: 'submittedTicket', time: '1h ago', avatar: 'BM' },
+  { user: 'Carol W.', actionKey: 'renewedLicense', time: '3h ago', avatar: 'CW' },
+  { user: 'David L.', actionKey: 'paymentFailed', time: '5h ago', avatar: 'DL' },
 ]
 
 export const weeklyRevenue = [18, 32, 27, 45, 38, 52, 48]

@@ -12,6 +12,7 @@ import {
   Chip,
 } from '@heroui/react'
 import { recentOrders } from '../data/mockData'
+import { useI18n } from '../i18n/context'
 
 const statusColor = {
   paid: 'success',
@@ -20,15 +21,19 @@ const statusColor = {
 }
 
 export default function OrdersTable() {
+  const { t } = useI18n()
+
   return (
     <Card className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
       <CardHeader className="px-5 pt-5 pb-0 flex justify-between items-center">
         <div>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-white">Recent Orders</p>
-          <p className="text-xs text-zinc-400">Latest 5 transactions</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+            {t.ordersTable.title}
+          </p>
+          <p className="text-xs text-zinc-400">{t.ordersTable.subtitle}</p>
         </div>
         <button className="text-xs text-violet-500 hover:text-violet-700 font-medium transition-colors">
-          View all →
+          {t.ordersTable.viewAll}
         </button>
       </CardHeader>
       <CardContent className="px-5 pb-5">
@@ -36,19 +41,19 @@ export default function OrdersTable() {
           <TableContent>
             <TableHeader>
               <TableColumn isRowHeader className="text-xs text-zinc-400 font-medium uppercase">
-                Order
+                {t.ordersTable.columns.order}
               </TableColumn>
               <TableColumn className="text-xs text-zinc-400 font-medium uppercase">
-                Customer
+                {t.ordersTable.columns.customer}
               </TableColumn>
               <TableColumn className="text-xs text-zinc-400 font-medium uppercase">
-                Product
+                {t.ordersTable.columns.product}
               </TableColumn>
               <TableColumn className="text-xs text-zinc-400 font-medium uppercase">
-                Amount
+                {t.ordersTable.columns.amount}
               </TableColumn>
               <TableColumn className="text-xs text-zinc-400 font-medium uppercase">
-                Status
+                {t.ordersTable.columns.status}
               </TableColumn>
             </TableHeader>
             <TableBody>
@@ -64,7 +69,7 @@ export default function OrdersTable() {
                   </TableCell>
                   <TableCell>
                     <Chip size="sm" color={statusColor[order.status]} variant="flat">
-                      {order.status}
+                      {t.ordersTable.status[order.status]}
                     </Chip>
                   </TableCell>
                 </TableRow>

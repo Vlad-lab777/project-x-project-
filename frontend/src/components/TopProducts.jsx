@@ -7,14 +7,19 @@ import {
   ProgressBarFill,
 } from '@heroui/react'
 import { topProducts } from '../data/mockData'
+import { useI18n } from '../i18n/context'
 
 export default function TopProducts() {
+  const { t } = useI18n()
+
   return (
     <Card className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
       <CardHeader className="px-5 pt-5 pb-0">
         <div>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-white">Top Products</p>
-          <p className="text-xs text-zinc-400">By revenue share</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+            {t.topProducts.title}
+          </p>
+          <p className="text-xs text-zinc-400">{t.topProducts.subtitle}</p>
         </div>
       </CardHeader>
       <CardContent className="px-5 pb-5 flex flex-col gap-4">
@@ -25,7 +30,7 @@ export default function TopProducts() {
                 {product.name}
               </span>
               <span className="text-xs text-zinc-400">
-                {product.sales} sales · {product.revenue}
+                {product.sales} {t.topProducts.salesUnit} · {product.revenue}
               </span>
             </div>
             <ProgressBar
