@@ -115,13 +115,11 @@ export default function ProductsPage() {
       {/* Tab: List */}
       {activeTab === 'list' && (
         <Card className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
-          <CardHeader className="px-5 pt-5 pb-0 flex justify-between items-center">
-            <div>
-              <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                {t.products.list.title}
-              </p>
-              <p className="text-xs text-zinc-400">{t.products.list.subtitle}</p>
-            </div>
+          <CardHeader className="px-5 pt-6 pb-0 flex flex-col items-center text-center gap-1">
+            <p className="text-base font-semibold text-zinc-900 dark:text-white">
+              {t.products.list.title}
+            </p>
+            <p className="text-xs text-zinc-400">{t.products.list.subtitle}</p>
             <span className="text-xs text-zinc-400">
               {products.length} {t.products.list.total}
             </span>
