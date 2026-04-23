@@ -75,6 +75,98 @@ const en = {
     title: 'Activity',
     subtitle: 'Recent events',
   },
+
+  // Products
+  products: {
+    tabs: {
+      list: 'Products',
+      create: 'Create',
+    },
+    list: {
+      title: 'All Products',
+      subtitle: 'Manage your product catalog',
+      total: 'items',
+    },
+    create: {
+      hint: 'Add a new product to your catalog',
+      button: '+ Create Product',
+    },
+    columns: {
+      id: 'ID',
+      name: 'Name',
+      category: 'Category',
+      price: 'Price',
+      stock: 'Stock',
+      status: 'Status',
+    },
+    status: {
+      active: 'active',
+      low_stock: 'low stock',
+      out_of_stock: 'out of stock',
+    },
+    modal: {
+      title: 'Create Product',
+      name: 'Product Name',
+      namePlaceholder: 'e.g. Wireless Headphones',
+      category: 'Category',
+      categoryPlaceholder: 'Select category',
+      price: 'Price ($)',
+      stock: 'Stock',
+      description: 'Description',
+      descriptionPlaceholder: 'Optional description...',
+      submit: 'Create',
+      cancel: 'Cancel',
+    },
+    categories: ['Electronics', 'Sports', 'Kitchen', 'Clothing', 'Books', 'Other'],
+  },
+
+  // Settings
+  settings: {
+    title: 'Settings',
+    subtitle: 'Manage your account and preferences',
+    save: 'Save changes',
+    saved: 'Saved!',
+    profile: {
+      title: 'Profile',
+      subtitle: 'Your personal information',
+      name: 'Full name',
+      email: 'Email address',
+      initials: 'Avatar initials',
+      initialsHint: 'Shown in sidebar (2 chars max)',
+      changePassword: 'Change password',
+      currentPassword: 'Current password',
+      newPassword: 'New password',
+      confirmPassword: 'Confirm password',
+      updatePassword: 'Update password',
+      cancel: 'Cancel',
+    },
+    appearance: {
+      title: 'Appearance',
+      subtitle: 'Theme preferences',
+      light: '☀️ Light',
+      dark: '🌙 Dark',
+    },
+    language: {
+      title: 'Language',
+      subtitle: 'Display language',
+    },
+    dashboard: {
+      title: 'Dashboard',
+      subtitle: 'Customize your dashboard',
+      widgetsLabel: 'Widgets & order',
+      chartRangeLabel: 'Default chart range',
+      rangeWeek: 'Week',
+      rangeMonth: 'Month',
+      rangeYear: 'Year',
+      widgets: {
+        stats: 'Statistics cards',
+        revenueChart: 'Revenue chart',
+        topProducts: 'Top products',
+        ordersTable: 'Recent orders',
+        activityFeed: 'Activity feed',
+      },
+    },
+  },
 }
 
 export default en

@@ -37,8 +37,8 @@ export default function OrdersTable() {
         </button>
       </CardHeader>
       <CardContent className="px-5 pb-5">
-        <Table className="mt-2" aria-label="Recent orders">
-          <TableContent>
+        <Table className="mt-2">
+          <TableContent aria-label={t.ordersTable.title}>
             <TableHeader>
               <TableColumn isRowHeader className="text-xs text-zinc-400 font-medium uppercase">
                 {t.ordersTable.columns.order}
