@@ -75,6 +75,98 @@ const uk = {
     title: 'Активність',
     subtitle: 'Останні події',
   },
+
+  // Products
+  products: {
+    tabs: {
+      list: 'Продукти',
+      create: 'Створити',
+    },
+    list: {
+      title: 'Всі продукти',
+      subtitle: 'Управління каталогом продуктів',
+      total: 'позицій',
+    },
+    create: {
+      hint: 'Додайте новий продукт до каталогу',
+      button: '+ Створити продукт',
+    },
+    columns: {
+      id: 'ID',
+      name: 'Назва',
+      category: 'Категорія',
+      price: 'Ціна',
+      stock: 'Запас',
+      status: 'Статус',
+    },
+    status: {
+      active: 'активний',
+      low_stock: 'мало',
+      out_of_stock: 'немає',
+    },
+    modal: {
+      title: 'Створити продукт',
+      name: 'Назва продукту',
+      namePlaceholder: 'напр. Бездротові навушники',
+      category: 'Категорія',
+      categoryPlaceholder: 'Оберіть категорію',
+      price: 'Ціна ($)',
+      stock: 'Кількість',
+      description: 'Опис',
+      descriptionPlaceholder: 'Необовʼязковий опис...',
+      submit: 'Створити',
+      cancel: 'Скасувати',
+    },
+    categories: ['Електроніка', 'Спорт', 'Кухня', 'Одяг', 'Книги', 'Інше'],
+  },
+
+  // Settings
+  settings: {
+    title: 'Налаштування',
+    subtitle: 'Керуйте обліковим записом та вподобаннями',
+    save: 'Зберегти зміни',
+    saved: 'Збережено!',
+    profile: {
+      title: 'Профіль',
+      subtitle: 'Ваша особиста інформація',
+      name: "Повне ім'я",
+      email: 'Email адреса',
+      initials: 'Ініціали аватара',
+      initialsHint: 'Відображається в сайдбарі (макс. 2 символи)',
+      changePassword: 'Змінити пароль',
+      currentPassword: 'Поточний пароль',
+      newPassword: 'Новий пароль',
+      confirmPassword: 'Підтвердіть пароль',
+      updatePassword: 'Оновити пароль',
+      cancel: 'Скасувати',
+    },
+    appearance: {
+      title: 'Зовнішній вигляд',
+      subtitle: 'Налаштування теми',
+      light: '☀️ Світла',
+      dark: '🌙 Темна',
+    },
+    language: {
+      title: 'Мова',
+      subtitle: 'Мова інтерфейсу',
+    },
+    dashboard: {
+      title: 'Дашборд',
+      subtitle: 'Налаштуйте дашборд',
+      widgetsLabel: 'Віджети та порядок',
+      chartRangeLabel: 'Діапазон графіку за замовчуванням',
+      rangeWeek: 'Тиждень',
+      rangeMonth: 'Місяць',
+      rangeYear: 'Рік',
+      widgets: {
+        stats: 'Картки статистики',
+        revenueChart: 'Графік доходу',
+        topProducts: 'Топ продукти',
+        ordersTable: 'Останні замовлення',
+        activityFeed: 'Стрічка активності',
+      },
+    },
+  },
 }
 
 export default uk

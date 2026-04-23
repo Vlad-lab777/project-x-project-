@@ -18,7 +18,10 @@ export default function ActivityFeed() {
       <CardContent className="px-5 pb-5 flex flex-col gap-3">
         {activityFeed.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <Avatar className="bg-violet-100 text-violet-700 text-xs font-bold shrink-0 w-8 h-8">
+            <Avatar
+              aria-label={item.user}
+              className="bg-violet-100 text-violet-700 text-xs font-bold shrink-0 w-8 h-8"
+            >
               <AvatarFallback>{item.avatar}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
