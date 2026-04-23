@@ -120,6 +120,41 @@ const uk = {
     categories: ['Електроніка', 'Спорт', 'Кухня', 'Одяг', 'Книги', 'Інше'],
   },
 
+  // Order
+  order: {
+    title: 'Нове замовлення',
+    subtitle: 'Оберіть товари та вкажіть дані доставки',
+    products: {
+      title: 'Товари',
+      subtitle: 'Оберіть товари для замовлення',
+      selected: 'Обрано',
+      total: 'Сума',
+      noSelected: 'Оберіть хоча б один товар',
+    },
+    form: {
+      title: 'Дані доставки',
+      fullName: 'ПІБ',
+      fullNamePlaceholder: 'Прізвище Імʼя По-батькові',
+      phone: 'Номер телефону',
+      phonePlaceholder: '+38 (0XX) XXX-XX-XX',
+      email: 'Email',
+      emailPlaceholder: 'example@email.com',
+      optional: 'необовʼязково',
+      city: 'Місто',
+      cityPlaceholder: 'напр. Київ',
+      postBranch: 'Відділення пошти',
+      postBranchPlaceholder: 'напр. Нова Пошта №1',
+      required: 'Обовʼязкове поле',
+      invalidPhone: 'Введіть коректний номер телефону',
+      invalidEmail: 'Введіть коректний email',
+      invalidFullName: 'Введіть прізвище та імʼя',
+      submit: 'Оформити замовлення',
+      success: 'Замовлення прийнято!',
+      successMessage: 'Ми звʼяжемося з вами найближчим часом.',
+      newOrder: 'Нове замовлення',
+    },
+  },
+
   // Settings
   settings: {
     title: 'Налаштування',

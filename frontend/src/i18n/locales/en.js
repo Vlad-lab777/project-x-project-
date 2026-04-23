@@ -120,6 +120,41 @@ const en = {
     categories: ['Electronics', 'Sports', 'Kitchen', 'Clothing', 'Books', 'Other'],
   },
 
+  // Order
+  order: {
+    title: 'New Order',
+    subtitle: 'Select products and fill in delivery details',
+    products: {
+      title: 'Products',
+      subtitle: 'Select products for your order',
+      selected: 'Selected',
+      total: 'Total',
+      noSelected: 'Please select at least one product',
+    },
+    form: {
+      title: 'Delivery Details',
+      fullName: 'Full Name',
+      fullNamePlaceholder: 'Last First Middle name',
+      phone: 'Phone Number',
+      phonePlaceholder: '+38 (0XX) XXX-XX-XX',
+      email: 'Email',
+      emailPlaceholder: 'example@email.com',
+      optional: 'optional',
+      city: 'City',
+      cityPlaceholder: 'e.g. Kyiv',
+      postBranch: 'Post Office Branch',
+      postBranchPlaceholder: 'e.g. Nova Poshta #1',
+      required: 'Required field',
+      invalidPhone: 'Enter a valid phone number',
+      invalidEmail: 'Enter a valid email',
+      invalidFullName: 'Enter last name and first name',
+      submit: 'Place Order',
+      success: 'Order placed!',
+      successMessage: 'We will contact you shortly.',
+      newOrder: 'New Order',
+    },
+  },
+
   // Settings
   settings: {
     title: 'Settings',

@@ -7,6 +7,7 @@ import TopProducts from './components/TopProducts'
 import ActivityFeed from './components/ActivityFeed'
 import SettingsPage from './pages/SettingsPage'
 import ProductsPage from './pages/ProductsPage'
+import OrderPage from './pages/OrderPage'
 import { stats } from './data/mockData'
 import { Button, Input } from '@heroui/react'
 import { useSettings } from './context/SettingsContext'
@@ -92,16 +93,21 @@ function App() {
 
   const isSettings = currentPage === 'settings'
   const isProducts = currentPage === 'products'
+  const isOrders = currentPage === 'orders'
   const pageTitle = isSettings
     ? t.settings.title
     : isProducts
       ? t.products.list.title
-      : t.header.title
+      : isOrders
+        ? t.order.title
+        : t.header.title
   const pageSubtitle = isSettings
     ? t.settings.subtitle
     : isProducts
       ? t.products.list.subtitle
-      : t.header.welcome
+      : isOrders
+        ? t.order.subtitle
+        : t.header.welcome
 
   return (
     <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans">
@@ -133,7 +139,7 @@ function App() {
             >
               {locale === 'uk' ? 'EN' : 'УК'}
             </button>
-            {!isSettings && !isProducts && (
+            {!isSettings && !isProducts && !isOrders && (
               <Button className="bg-violet-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 rounded-lg hover:bg-violet-700 transition-colors">
                 {t.header.newOrder}
               </Button>
@@ -141,7 +147,7 @@ function App() {
           </div>
         </header>
 
-        {isSettings ? <SettingsPage /> : isProducts ? <ProductsPage /> : <DashboardContent />}
+        {isSettings ? <SettingsPage /> : isProducts ? <ProductsPage /> : isOrders ? <OrderPage /> : <DashboardContent />}
       </main>
     </div>
   )
