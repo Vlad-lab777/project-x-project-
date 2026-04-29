@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, FormEvent } from 'react'
 import {
   Card,
   CardContent,
@@ -39,25 +39,25 @@ export default function SettingsPage() {
   const [profileSaved, setProfileSaved] = useState(false)
   const [passwordSaved, setPasswordSaved] = useState(false)
 
-  function flash(setter) {
+  function flash(setter: (v: boolean) => void) {
     setter(true)
     setTimeout(() => setter(false), 2000)
   }
 
-  function handleSaveProfile(e) {
+  function handleSaveProfile(e: FormEvent) {
     e.preventDefault()
     updateProfile(profileForm)
     flash(setProfileSaved)
   }
 
-  function handleSavePassword(e) {
+  function handleSavePassword(e: FormEvent) {
     e.preventDefault()
     setPasswordForm({ current: '', new: '', confirm: '' })
     setShowPassword(false)
     flash(setPasswordSaved)
   }
 
-  function toggleWidget(id) {
+  function toggleWidget(id: string) {
     const { visibleWidgets } = settings.dashboard
     const next = visibleWidgets.includes(id)
       ? visibleWidgets.filter((w) => w !== id)
@@ -66,7 +66,7 @@ export default function SettingsPage() {
     updateDashboard({ visibleWidgets: next })
   }
 
-  function moveWidget(id, dir) {
+  function moveWidget(id: string, dir: number) {
     const order = [...settings.dashboard.widgetOrder]
     const idx = order.indexOf(id)
     const target = idx + dir
@@ -180,7 +180,7 @@ export default function SettingsPage() {
                   <Input
                     type="password"
                     className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm outline-none"
-                    value={passwordForm[field]}
+                    value={passwordForm[field as keyof typeof passwordForm]}
                     onChange={(e) => setPasswordForm((p) => ({ ...p, [field]: e.target.value }))}
                   />
                 </TextField>
@@ -218,7 +218,7 @@ export default function SettingsPage() {
             selectionMode="single"
             selectedKeys={new Set([settings.theme])}
             disallowEmptySelection
-            onSelectionChange={(keys) => updateSettings({ theme: [...keys][0] })}
+            onSelectionChange={(keys) => updateSettings({ theme: String([...keys][0]) })}
             aria-label="Theme"
           >
             <ToggleButton id="light">{ts.appearance.light}</ToggleButton>
@@ -240,7 +240,7 @@ export default function SettingsPage() {
             selectionMode="single"
             selectedKeys={new Set([locale])}
             disallowEmptySelection
-            onSelectionChange={(keys) => setLocale([...keys][0])}
+            onSelectionChange={(keys) => setLocale(String([...keys][0]))}
             aria-label="Language"
           >
             {Object.entries(LOCALE_LABELS).map(([id, label]) => (
@@ -270,7 +270,7 @@ export default function SettingsPage() {
               selectionMode="single"
               selectedKeys={new Set([settings.dashboard.chartRange])}
               disallowEmptySelection
-              onSelectionChange={(keys) => updateDashboard({ chartRange: [...keys][0] })}
+              onSelectionChange={(keys) => updateDashboard({ chartRange: String([...keys][0]) })}
               aria-label="Chart range"
             >
               <ToggleButton id="week">{ts.dashboard.rangeWeek}</ToggleButton>
@@ -298,7 +298,7 @@ export default function SettingsPage() {
                       isSelected={visible}
                       onChange={() => toggleWidget(id)}
                       size="sm"
-                      aria-label={ts.dashboard.widgets[id]}
+                      aria-label={(ts.dashboard.widgets as Record<string, string>)[id]}
                     >
                       <SwitchControl>
                         <SwitchThumb />
@@ -312,7 +312,7 @@ export default function SettingsPage() {
                           : 'text-zinc-400 dark:text-zinc-500 line-through'
                       }`}
                     >
-                      {ts.dashboard.widgets[id]}
+                      {(ts.dashboard.widgets as Record<string, string>)[id]}
                     </span>
 
                     <div className="flex flex-col">

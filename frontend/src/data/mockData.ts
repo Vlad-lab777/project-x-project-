@@ -1,4 +1,10 @@
-export const stats = [
+export const stats: Array<{
+  labelKey: string
+  value: string
+  change: string
+  trend: 'up' | 'down'
+  icon: string
+}> = [
   { labelKey: 'totalRevenue', value: '$48,295', change: '+12.5%', trend: 'up', icon: '💰' },
   { labelKey: 'activeUsers', value: '3,842', change: '+8.1%', trend: 'up', icon: '👥' },
   { labelKey: 'orders', value: '1,257', change: '-2.4%', trend: 'down', icon: '📦' },

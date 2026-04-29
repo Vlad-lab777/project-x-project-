@@ -14,7 +14,9 @@ import {
 import { recentOrders } from '../data/mockData'
 import { useI18n } from '../i18n/context'
 
-const statusColor = {
+type OrderStatus = 'paid' | 'pending' | 'failed'
+
+const statusColor: Record<OrderStatus, 'success' | 'warning' | 'danger'> = {
   paid: 'success',
   pending: 'warning',
   failed: 'danger',
@@ -68,8 +70,8 @@ export default function OrdersTable() {
                     {order.amount}
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" color={statusColor[order.status]} variant="flat">
-                      {t.ordersTable.status[order.status]}
+                    <Chip size="sm" color={statusColor[order.status as OrderStatus]}>
+                      {(t.ordersTable.status as Record<string, string>)[order.status]}
                     </Chip>
                   </TableCell>
                 </TableRow>

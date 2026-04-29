@@ -1,10 +1,35 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-const SettingsContext = createContext(null)
+interface Profile {
+  name: string
+  email: string
+  initials: string
+}
+
+interface Dashboard {
+  widgetOrder: string[]
+  visibleWidgets: string[]
+  chartRange: string
+}
+
+interface Settings {
+  theme: string
+  profile: Profile
+  dashboard: Dashboard
+}
+
+interface SettingsContextType {
+  settings: Settings
+  updateSettings: (patch: Partial<Settings>) => void
+  updateProfile: (patch: Partial<Profile>) => void
+  updateDashboard: (patch: Partial<Dashboard>) => void
+}
+
+const SettingsContext = createContext<SettingsContextType | null>(null)
 
 const WIDGET_IDS = ['stats', 'revenueChart', 'topProducts', 'ordersTable', 'activityFeed']
 
-const DEFAULT_SETTINGS = {
+const DEFAULT_SETTINGS: Settings = {
   theme: 'light',
   profile: {
     name: 'Admin',
@@ -18,17 +43,17 @@ const DEFAULT_SETTINGS = {
   },
 }
 
-function applyTheme(theme) {
+function applyTheme(theme: string) {
   document.documentElement.classList.toggle('dark', theme === 'dark')
 }
 
-export function SettingsProvider({ children }) {
-  const [settings, setSettings] = useState(() => {
+export function SettingsProvider({ children }: { children: ReactNode }) {
+  const [settings, setSettings] = useState<Settings>(() => {
     try {
       const stored = localStorage.getItem('app-settings')
       if (stored) {
-        const parsed = JSON.parse(stored)
-        const merged = {
+        const parsed = JSON.parse(stored) as Partial<Settings>
+        const merged: Settings = {
           ...DEFAULT_SETTINGS,
           ...parsed,
           profile: { ...DEFAULT_SETTINGS.profile, ...parsed.profile },
@@ -49,10 +74,11 @@ export function SettingsProvider({ children }) {
     applyTheme(settings.theme)
   }, [settings])
 
-  const updateSettings = (patch) => setSettings((prev) => ({ ...prev, ...patch }))
-  const updateProfile = (patch) =>
+  const updateSettings = (patch: Partial<Settings>) =>
+    setSettings((prev) => ({ ...prev, ...patch }))
+  const updateProfile = (patch: Partial<Profile>) =>
     setSettings((prev) => ({ ...prev, profile: { ...prev.profile, ...patch } }))
-  const updateDashboard = (patch) =>
+  const updateDashboard = (patch: Partial<Dashboard>) =>
     setSettings((prev) => ({ ...prev, dashboard: { ...prev.dashboard, ...patch } }))
 
   return (
@@ -63,7 +89,7 @@ export function SettingsProvider({ children }) {
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useSettings() {
+export function useSettings(): SettingsContextType {
   const ctx = useContext(SettingsContext)
   if (!ctx) throw new Error('useSettings must be used inside SettingsProvider')
   return ctx
