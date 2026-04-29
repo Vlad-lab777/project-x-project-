@@ -32,5 +32,11 @@ app.get('/api/products', async (req, res) => {
   res.json(products)
 })
 
+app.delete('/api/products/:id', async (req, res) => {
+  const { id } = req.params
+  await sql`DELETE FROM products WHERE id = ${id}`
+  res.status(204).end()
+})
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
