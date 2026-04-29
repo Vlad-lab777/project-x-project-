@@ -14,6 +14,7 @@ import {
   Button,
 } from '@heroui/react'
 import { useI18n } from '../i18n/context'
+import ConfirmModal from '../components/ConfirmModal'
 
 const EMPTY_FORM = { name: '', category: '', price: '', stock: '', description: '' }
 
@@ -29,6 +30,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
+  const [deleteId, setDeleteId] = useState(null)
 
   useEffect(() => {
     fetch('http://localhost:3000/api/products')
@@ -46,6 +48,12 @@ export default function ProductsPage() {
         )
       )
   }, [])
+
+  async function handleDelete() {
+    await fetch(`http://localhost:3000/api/products/${deleteId}`, { method: 'DELETE' })
+    setProducts(products.filter((p) => p.id !== deleteId))
+    setDeleteId(null)
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -130,6 +138,7 @@ export default function ProductsPage() {
                   <TableColumn className="text-xs text-zinc-400 font-medium uppercase">
                     {t.products.columns.status}
                   </TableColumn>
+                  <TableColumn className="text-xs text-zinc-400 font-medium uppercase w-10" />
                 </TableHeader>
                 <TableBody>
                   {products.map((p) => (
@@ -147,6 +156,30 @@ export default function ProductsPage() {
                         <Chip size="sm" color={statusColor[p.status]} variant="flat">
                           {t.products.status[p.status]}
                         </Chip>
+                      </TableCell>
+                      <TableCell>
+                        <button
+                          onClick={() => setDeleteId(p.id)}
+                          className="text-zinc-400 hover:text-red-500 transition-colors"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6" />
+                            <path d="M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                          </svg>
+                        </button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -286,6 +319,14 @@ export default function ProductsPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {deleteId && (
+        <ConfirmModal
+          message="Ви впевнені, що хочете видалити цей продукт?"
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteId(null)}
+        />
       )}
     </div>
   )
