@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Card,
   CardContent,
@@ -15,49 +15,6 @@ import {
 } from '@heroui/react'
 import { useI18n } from '../i18n/context'
 
-const INITIAL_PRODUCTS = [
-  {
-    id: 'PRD-001',
-    name: 'Wireless Headphones',
-    category: 'Electronics',
-    price: '$149.99',
-    stock: 45,
-    status: 'active',
-  },
-  {
-    id: 'PRD-002',
-    name: 'Running Shoes',
-    category: 'Sports',
-    price: '$89.99',
-    stock: 128,
-    status: 'active',
-  },
-  {
-    id: 'PRD-003',
-    name: 'Coffee Maker',
-    category: 'Kitchen',
-    price: '$59.99',
-    stock: 12,
-    status: 'low_stock',
-  },
-  {
-    id: 'PRD-004',
-    name: 'Yoga Mat',
-    category: 'Sports',
-    price: '$34.99',
-    stock: 0,
-    status: 'out_of_stock',
-  },
-  {
-    id: 'PRD-005',
-    name: 'Smart Watch',
-    category: 'Electronics',
-    price: '$299.99',
-    stock: 67,
-    status: 'active',
-  },
-]
-
 const EMPTY_FORM = { name: '', category: '', price: '', stock: '', description: '' }
 
 const statusColor = {
@@ -69,23 +26,50 @@ const statusColor = {
 export default function ProductsPage() {
   const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('list')
-  const [products, setProducts] = useState(INITIAL_PRODUCTS)
+  const [products, setProducts] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
 
-  function handleSubmit(e) {
+  useEffect(() => {
+    fetch('http://localhost:3000/api/products')
+      .then((r) => r.json())
+      .then((data) =>
+        setProducts(
+          data.map((p) => ({
+            id: p.id,
+            name: p.name,
+            category: p.category,
+            price: `$${parseFloat(p.price).toFixed(2)}`,
+            stock: p.stock,
+            status: p.status,
+          }))
+        )
+      )
+  }, [])
+
+  async function handleSubmit(e) {
     e.preventDefault()
-    const stock = parseInt(form.stock, 10)
-    const status = stock === 0 ? 'out_of_stock' : stock < 15 ? 'low_stock' : 'active'
+    const res = await fetch('http://localhost:3000/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: form.name,
+        category: form.category,
+        price: parseFloat(form.price),
+        stock: parseInt(form.stock, 10),
+        description: form.description,
+      }),
+    })
+    const product = await res.json()
     setProducts([
       ...products,
       {
-        id: `PRD-${String(products.length + 1).padStart(3, '0')}`,
-        name: form.name,
-        category: form.category,
-        price: `$${parseFloat(form.price).toFixed(2)}`,
-        stock,
-        status,
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        price: `$${parseFloat(product.price).toFixed(2)}`,
+        stock: product.stock,
+        status: product.status,
       },
     ])
     setForm(EMPTY_FORM)
