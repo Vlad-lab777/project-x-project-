@@ -29,7 +29,43 @@ interface ClientForm {
   city: string
 }
 
+interface FormErrors {
+  full_name?: string
+  phone?: string
+  email?: string
+  city?: string
+}
+
 const EMPTY_FORM: ClientForm = { full_name: '', phone: '', email: '', city: '' }
+
+function validateForm(form: ClientForm): FormErrors {
+  const errors: FormErrors = {}
+
+  const nameParts = form.full_name.trim().split(/\s+/)
+  if (!form.full_name.trim()) {
+    errors.full_name = "ПІБ обов'язкове поле"
+  } else if (nameParts.length < 2) {
+    errors.full_name = "Введіть мінімум прізвище та ім'я"
+  } else if (!/^[a-zA-Zа-яА-ЯіІїЇєЄґҐ'\- ]+$/.test(form.full_name)) {
+    errors.full_name = 'ПІБ може містити лише літери, пробіли та дефіс'
+  }
+
+  if (!form.phone.trim()) {
+    errors.phone = "Телефон обов'язкове поле"
+  } else if (!/^\+?[\d\s\-()]{7,15}$/.test(form.phone.trim())) {
+    errors.phone = 'Введіть коректний номер телефону'
+  }
+
+  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+    errors.email = 'Введіть коректний email'
+  }
+
+  if (form.city.trim() && !/^[a-zA-Zа-яА-ЯіІїЇєЄґҐ'\- ]+$/.test(form.city.trim())) {
+    errors.city = 'Місто може містити лише літери'
+  }
+
+  return errors
+}
 
 export default function ClientsPage() {
   const { t } = useI18n()
@@ -38,6 +74,7 @@ export default function ClientsPage() {
   const [showModal, setShowModal] = useState(false)
   const [editClient, setEditClient] = useState<Client | null>(null)
   const [form, setForm] = useState<ClientForm>(EMPTY_FORM)
+  const [errors, setErrors] = useState<FormErrors>({})
   const [deleteId, setDeleteId] = useState<number | null>(null)
 
   useEffect(() => {
@@ -49,6 +86,7 @@ export default function ClientsPage() {
   function openAdd() {
     setEditClient(null)
     setForm(EMPTY_FORM)
+    setErrors({})
     setShowModal(true)
   }
 
@@ -60,11 +98,24 @@ export default function ClientsPage() {
       email: client.email || '',
       city: client.city || '',
     })
+    setErrors({})
     setShowModal(true)
+  }
+
+  function handleChange(field: keyof ClientForm, value: string) {
+    const updated = { ...form, [field]: value }
+    setForm(updated)
+    const fieldError = validateForm(updated)[field]
+    setErrors((prev) => ({ ...prev, [field]: fieldError }))
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    const validation = validateForm(form)
+    if (Object.keys(validation).length > 0) {
+      setErrors(validation)
+      return
+    }
     if (editClient) {
       const res = await fetch(`http://localhost:3000/api/clients/${editClient.id}`, {
         method: 'PUT',
@@ -224,12 +275,14 @@ export default function ClientsPage() {
                   {c.modal.fullName} *
                 </label>
                 <input
-                  required
                   value={form.full_name}
-                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  onChange={(e) => handleChange('full_name', e.target.value)}
                   placeholder={c.modal.fullNamePlaceholder}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors"
+                  className={`w-full bg-zinc-50 dark:bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors ${errors.full_name ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}`}
                 />
+                {errors.full_name && (
+                  <p className="text-xs text-red-500 mt-1">{errors.full_name}</p>
+                )}
               </div>
 
               <div>
@@ -237,13 +290,13 @@ export default function ClientsPage() {
                   {c.modal.phone} *
                 </label>
                 <input
-                  required
                   type="tel"
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) => handleChange('phone', e.target.value)}
                   placeholder={c.modal.phonePlaceholder}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors"
+                  className={`w-full bg-zinc-50 dark:bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors ${errors.phone ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}`}
                 />
+                {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -252,12 +305,12 @@ export default function ClientsPage() {
                     {c.modal.email}
                   </label>
                   <input
-                    type="email"
                     value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    onChange={(e) => handleChange('email', e.target.value)}
                     placeholder={c.modal.emailPlaceholder}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors"
+                    className={`w-full bg-zinc-50 dark:bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors ${errors.email ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}`}
                   />
+                  {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
@@ -265,10 +318,11 @@ export default function ClientsPage() {
                   </label>
                   <input
                     value={form.city}
-                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    onChange={(e) => handleChange('city', e.target.value)}
                     placeholder={c.modal.cityPlaceholder}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors"
+                    className={`w-full bg-zinc-50 dark:bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors ${errors.city ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}`}
                   />
+                  {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
                 </div>
               </div>
 
