@@ -155,6 +155,36 @@ const uk = {
     },
   },
 
+  // Clients
+  clients: {
+    title: 'Клієнти',
+    subtitle: 'Управління базою клієнтів',
+    total: 'клієнтів',
+    add: '+ Додати клієнта',
+    empty: 'Клієнтів ще немає',
+    columns: {
+      id: 'ID',
+      fullName: 'ПІБ',
+      phone: 'Телефон',
+      email: 'Email',
+      city: 'Місто',
+    },
+    modal: {
+      titleAdd: 'Додати клієнта',
+      titleEdit: 'Редагувати клієнта',
+      fullName: 'ПІБ',
+      fullNamePlaceholder: 'Прізвище Імʼя По-батькові',
+      phone: 'Телефон',
+      phonePlaceholder: '+38 (0XX) XXX-XX-XX',
+      email: 'Email',
+      emailPlaceholder: 'example@email.com',
+      city: 'Місто',
+      cityPlaceholder: 'напр. Київ',
+      submit: 'Зберегти',
+      cancel: 'Скасувати',
+    },
+  },
+
   // Settings
   settings: {
     title: 'Налаштування',

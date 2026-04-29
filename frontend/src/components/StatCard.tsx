@@ -1,16 +1,25 @@
 import { Card, CardContent } from '@heroui/react'
 import { useI18n } from '../i18n/context'
 
-export default function StatCard({ labelKey, value, change, trend, icon }) {
+interface StatCardProps {
+  labelKey: string
+  value: string
+  change: string
+  trend: 'up' | 'down'
+  icon: string
+}
+
+export default function StatCard({ labelKey, value, change, trend, icon }: StatCardProps) {
   const { t } = useI18n()
   const isUp = trend === 'up'
+  const stats = t.stats as Record<string, string>
 
   return (
     <Card className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2 mb-3">
           <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-widest leading-tight">
-            {t.stats[labelKey]}
+            {stats[labelKey]}
           </p>
           <span className="text-xl shrink-0">{icon}</span>
         </div>

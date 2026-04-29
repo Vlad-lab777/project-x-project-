@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import {
   Card,
   CardContent,
@@ -16,9 +16,28 @@ import {
 import { useI18n } from '../i18n/context'
 import ConfirmModal from '../components/ConfirmModal'
 
-const EMPTY_FORM = { name: '', category: '', price: '', stock: '', description: '' }
+type ProductStatus = 'active' | 'low_stock' | 'out_of_stock'
 
-const statusColor = {
+interface Product {
+  id: number
+  name: string
+  category: string
+  price: string
+  stock: number
+  status: ProductStatus
+}
+
+interface ProductForm {
+  name: string
+  category: string
+  price: string
+  stock: string
+  description: string
+}
+
+const EMPTY_FORM: ProductForm = { name: '', category: '', price: '', stock: '', description: '' }
+
+const statusColor: Record<ProductStatus, 'success' | 'warning' | 'danger'> = {
   active: 'success',
   low_stock: 'warning',
   out_of_stock: 'danger',
@@ -27,23 +46,24 @@ const statusColor = {
 export default function ProductsPage() {
   const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('list')
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState<Product[]>([])
   const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [deleteId, setDeleteId] = useState(null)
+  const [form, setForm] = useState<ProductForm>(EMPTY_FORM)
+  const [deleteId, setDeleteId] = useState<number | null>(null)
 
   useEffect(() => {
     fetch('http://localhost:3000/api/products')
       .then((r) => r.json())
       .then((data) =>
         setProducts(
-          data.map((p) => ({
-            id: p.id,
-            name: p.name,
-            category: p.category,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          data.map((p: any) => ({
+            id: p.id as number,
+            name: p.name as string,
+            category: p.category as string,
             price: `$${parseFloat(p.price).toFixed(2)}`,
-            stock: p.stock,
-            status: p.status,
+            stock: p.stock as number,
+            status: p.status as ProductStatus,
           }))
         )
       )
@@ -55,7 +75,7 @@ export default function ProductsPage() {
     setDeleteId(null)
   }
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const res = await fetch('http://localhost:3000/api/products', {
       method: 'POST',
@@ -68,16 +88,17 @@ export default function ProductsPage() {
         description: form.description,
       }),
     })
-    const product = await res.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const product: any = await res.json()
     setProducts([
       ...products,
       {
-        id: product.id,
-        name: product.name,
-        category: product.category,
+        id: product.id as number,
+        name: product.name as string,
+        category: product.category as string,
         price: `$${parseFloat(product.price).toFixed(2)}`,
-        stock: product.stock,
-        status: product.status,
+        stock: product.stock as number,
+        status: product.status as ProductStatus,
       },
     ])
     setForm(EMPTY_FORM)
@@ -99,7 +120,7 @@ export default function ProductsPage() {
                 : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
             }`}
           >
-            {t.products.tabs[tab]}
+            {(t.products.tabs as Record<string, string>)[tab]}
           </button>
         ))}
       </div>
@@ -153,7 +174,7 @@ export default function ProductsPage() {
                       </TableCell>
                       <TableCell className="text-xs text-zinc-500">{p.stock}</TableCell>
                       <TableCell>
-                        <Chip size="sm" color={statusColor[p.status]} variant="flat">
+                        <Chip size="sm" color={statusColor[p.status]}>
                           {t.products.status[p.status]}
                         </Chip>
                       </TableCell>

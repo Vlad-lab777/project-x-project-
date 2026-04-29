@@ -27,7 +27,7 @@ export default function ActivityFeed() {
             <div className="flex-1 min-w-0">
               <p className="text-xs text-zinc-700 dark:text-zinc-300">
                 <span className="font-semibold">{item.user}</span>{' '}
-                {t.activityActions[item.actionKey]}
+                {(t.activityActions as Record<string, string>)[item.actionKey]}
               </p>
               <p className="text-[10px] text-zinc-400 mt-0.5">{item.time}</p>
             </div>

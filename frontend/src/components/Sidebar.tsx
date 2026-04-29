@@ -1,7 +1,14 @@
 import { useI18n } from '../i18n/context'
 import { useSettings } from '../context/SettingsContext'
 
-export default function Sidebar({ open, onToggle, currentPage, onNavigate }) {
+interface SidebarProps {
+  open: boolean
+  onToggle: () => void
+  currentPage: string
+  onNavigate: (page: string) => void
+}
+
+export default function Sidebar({ open, onToggle, currentPage, onNavigate }: SidebarProps) {
   const { t } = useI18n()
   const { settings } = useSettings()
 

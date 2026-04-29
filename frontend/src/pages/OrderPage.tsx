@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import React from 'react'
 import { Card, CardContent, CardHeader, Chip } from '@heroui/react'
 import { useI18n } from '../i18n/context'
 
@@ -11,9 +12,31 @@ const PRODUCTS = [
   { id: 'PRD-006', name: 'Blender Pro', category: 'Kitchen', price: 79.99 },
 ]
 
-const EMPTY_FORM = { fullName: '', phone: '', email: '', city: '', postBranch: '' }
+interface DeliveryForm {
+  fullName: string
+  phone: string
+  email: string
+  city: string
+  postBranch: string
+}
 
-function QtyControl({ qty, onInc, onDec }) {
+interface FormErrors {
+  fullName?: boolean
+  phone?: boolean
+  city?: boolean
+  postBranch?: boolean
+  noProducts?: boolean
+}
+
+const EMPTY_FORM: DeliveryForm = { fullName: '', phone: '', email: '', city: '', postBranch: '' }
+
+interface QtyControlProps {
+  qty: number
+  onInc: () => void
+  onDec: () => void
+}
+
+function QtyControl({ qty, onInc, onDec }: QtyControlProps) {
   return (
     <div className="flex items-center gap-1.5">
       <button
@@ -41,21 +64,21 @@ export default function OrderPage() {
   const { t } = useI18n()
   const o = t.order
 
-  const [quantities, setQuantities] = useState({})
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [errors, setErrors] = useState({})
+  const [quantities, setQuantities] = useState<Record<string, number>>({})
+  const [form, setForm] = useState<DeliveryForm>(EMPTY_FORM)
+  const [errors, setErrors] = useState<FormErrors>({})
   const [submitted, setSubmitted] = useState(false)
 
-  const selected = PRODUCTS.filter((p) => quantities[p.id] > 0)
-  const total = selected.reduce((sum, p) => sum + p.price * quantities[p.id], 0)
+  const selected = PRODUCTS.filter((p) => (quantities[p.id] ?? 0) > 0)
+  const total = selected.reduce((sum, p) => sum + p.price * (quantities[p.id] ?? 0), 0)
 
-  function inc(id) {
-    setQuantities((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
+  function inc(id: string) {
+    setQuantities((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))
   }
 
-  function dec(id) {
+  function dec(id: string) {
     setQuantities((prev) => {
-      const next = (prev[id] || 0) - 1
+      const next = (prev[id] ?? 0) - 1
       if (next <= 0) {
         const { [id]: _, ...rest } = prev
         return rest
@@ -64,8 +87,8 @@ export default function OrderPage() {
     })
   }
 
-  function validate() {
-    const e = {}
+  function validate(): FormErrors {
+    const e: FormErrors = {}
     if (!form.fullName.trim()) e.fullName = true
     if (!form.phone.trim()) e.phone = true
     if (!form.city.trim()) e.city = true
@@ -74,7 +97,7 @@ export default function OrderPage() {
     return e
   }
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const e2 = validate()
     if (Object.keys(e2).length) {
@@ -143,7 +166,7 @@ export default function OrderPage() {
                       <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100 leading-tight">
                         {p.name}
                       </p>
-                      <Chip size="sm" variant="flat" color="default" className="mt-1 text-[10px]">
+                      <Chip size="sm" color="default" className="mt-1 text-[10px]">
                         {p.category}
                       </Chip>
                     </div>

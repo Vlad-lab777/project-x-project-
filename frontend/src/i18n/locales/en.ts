@@ -155,6 +155,36 @@ const en = {
     },
   },
 
+  // Clients
+  clients: {
+    title: 'Clients',
+    subtitle: 'Manage your client base',
+    total: 'clients',
+    add: '+ Add client',
+    empty: 'No clients yet',
+    columns: {
+      id: 'ID',
+      fullName: 'Full name',
+      phone: 'Phone',
+      email: 'Email',
+      city: 'City',
+    },
+    modal: {
+      titleAdd: 'Add client',
+      titleEdit: 'Edit client',
+      fullName: 'Full name',
+      fullNamePlaceholder: 'First Last',
+      phone: 'Phone',
+      phonePlaceholder: '+1 (XXX) XXX-XXXX',
+      email: 'Email',
+      emailPlaceholder: 'example@email.com',
+      city: 'City',
+      cityPlaceholder: 'e.g. New York',
+      submit: 'Save',
+      cancel: 'Cancel',
+    },
+  },
+
   // Settings
   settings: {
     title: 'Settings',
