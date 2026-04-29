@@ -8,6 +8,7 @@ import ActivityFeed from './components/ActivityFeed'
 import SettingsPage from './pages/SettingsPage'
 import ProductsPage from './pages/ProductsPage'
 import OrderPage from './pages/OrderPage'
+import ClientsPage from './pages/ClientsPage'
 import { stats } from './data/mockData'
 import { Button, Input } from '@heroui/react'
 import { useSettings } from './context/SettingsContext'
@@ -94,20 +95,25 @@ function App() {
   const isSettings = currentPage === 'settings'
   const isProducts = currentPage === 'products'
   const isOrders = currentPage === 'orders'
+  const isClients = currentPage === 'customers'
   const pageTitle = isSettings
     ? t.settings.title
     : isProducts
       ? t.products.list.title
       : isOrders
         ? t.order.title
-        : t.header.title
+        : isClients
+          ? t.clients.title
+          : t.header.title
   const pageSubtitle = isSettings
     ? t.settings.subtitle
     : isProducts
       ? t.products.list.subtitle
       : isOrders
         ? t.order.subtitle
-        : t.header.welcome
+        : isClients
+          ? t.clients.subtitle
+          : t.header.welcome
 
   return (
     <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans">
@@ -139,7 +145,7 @@ function App() {
             >
               {locale === 'uk' ? 'EN' : 'УК'}
             </button>
-            {!isSettings && !isProducts && !isOrders && (
+            {!isSettings && !isProducts && !isOrders && !isClients && (
               <Button className="bg-violet-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 rounded-lg hover:bg-violet-700 transition-colors">
                 {t.header.newOrder}
               </Button>
@@ -153,6 +159,8 @@ function App() {
           <ProductsPage />
         ) : isOrders ? (
           <OrderPage />
+        ) : isClients ? (
+          <ClientsPage />
         ) : (
           <DashboardContent />
         )}

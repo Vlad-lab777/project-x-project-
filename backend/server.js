@@ -38,5 +38,57 @@ app.delete('/api/products/:id', async (req, res) => {
   res.status(204).end()
 })
 
+// Clients
+app.get('/api/clients', async (req, res) => {
+  const clients = await sql`SELECT * FROM clients ORDER BY created_at DESC`
+  res.json(clients)
+})
+
+app.get('/api/clients/:id', async (req, res) => {
+  const { id } = req.params
+  const [client] = await sql`SELECT * FROM clients WHERE id = ${id}`
+  if (!client) return res.status(404).json({ error: 'Client not found' })
+  res.json(client)
+})
+
+app.post('/api/clients', async (req, res) => {
+  const { full_name, phone, email = '', city = '' } = req.body
+
+  if (!full_name || !phone) {
+    return res.status(400).json({ error: 'full_name and phone are required' })
+  }
+
+  const [client] = await sql`
+    INSERT INTO clients (full_name, phone, email, city)
+    VALUES (${full_name}, ${phone}, ${email}, ${city})
+    RETURNING *
+  `
+  res.status(201).json(client)
+})
+
+app.put('/api/clients/:id', async (req, res) => {
+  const { id } = req.params
+  const { full_name, phone, email = '', city = '' } = req.body
+
+  if (!full_name || !phone) {
+    return res.status(400).json({ error: 'full_name and phone are required' })
+  }
+
+  const [client] = await sql`
+    UPDATE clients
+    SET full_name = ${full_name}, phone = ${phone}, email = ${email}, city = ${city}
+    WHERE id = ${id}
+    RETURNING *
+  `
+  if (!client) return res.status(404).json({ error: 'Client not found' })
+  res.json(client)
+})
+
+app.delete('/api/clients/:id', async (req, res) => {
+  const { id } = req.params
+  await sql`DELETE FROM clients WHERE id = ${id}`
+  res.status(204).end()
+})
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
