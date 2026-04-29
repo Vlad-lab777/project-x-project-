@@ -147,7 +147,15 @@ function App() {
           </div>
         </header>
 
-        {isSettings ? <SettingsPage /> : isProducts ? <ProductsPage /> : isOrders ? <OrderPage /> : <DashboardContent />}
+        {isSettings ? (
+          <SettingsPage />
+        ) : isProducts ? (
+          <ProductsPage />
+        ) : isOrders ? (
+          <OrderPage />
+        ) : (
+          <DashboardContent />
+        )}
       </main>
     </div>
   )
