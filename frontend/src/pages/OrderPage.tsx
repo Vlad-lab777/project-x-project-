@@ -1,18 +1,25 @@
-import { useState } from 'react'
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, Chip } from '@heroui/react'
 import { useI18n } from '../i18n/context'
 
-const PRODUCTS = [
-  { id: 'PRD-001', name: 'Wireless Headphones', category: 'Electronics', price: 149.99 },
-  { id: 'PRD-002', name: 'Running Shoes', category: 'Sports', price: 89.99 },
-  { id: 'PRD-003', name: 'Coffee Maker', category: 'Kitchen', price: 59.99 },
-  { id: 'PRD-004', name: 'Smart Watch', category: 'Electronics', price: 299.99 },
-  { id: 'PRD-005', name: 'Yoga Mat', category: 'Sports', price: 34.99 },
-  { id: 'PRD-006', name: 'Blender Pro', category: 'Kitchen', price: 79.99 },
-]
+interface Product {
+  id: number
+  name: string
+  category: string
+  price: number
+  stock: number
+  status: string
+}
 
-interface DeliveryForm {
+interface OrderItem {
+  product_id: number
+  name: string
+  price: number
+  quantity: number
+  subtotal: number
+}
+
+interface FormState {
   fullName: string
   phone: string
   email: string
@@ -28,15 +35,9 @@ interface FormErrors {
   noProducts?: boolean
 }
 
-const EMPTY_FORM: DeliveryForm = { fullName: '', phone: '', email: '', city: '', postBranch: '' }
+const EMPTY_FORM: FormState = { fullName: '', phone: '', email: '', city: '', postBranch: '' }
 
-interface QtyControlProps {
-  qty: number
-  onInc: () => void
-  onDec: () => void
-}
-
-function QtyControl({ qty, onInc, onDec }: QtyControlProps) {
+function QtyControl({ qty, onInc, onDec }: { qty: number; onInc: () => void; onDec: () => void }) {
   return (
     <div className="flex items-center gap-1.5">
       <button
@@ -64,21 +65,34 @@ export default function OrderPage() {
   const { t } = useI18n()
   const o = t.order
 
-  const [quantities, setQuantities] = useState<Record<string, number>>({})
-  const [form, setForm] = useState<DeliveryForm>(EMPTY_FORM)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [quantities, setQuantities] = useState<Record<number, number>>({})
+  const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
-  const selected = PRODUCTS.filter((p) => (quantities[p.id] ?? 0) > 0)
-  const total = selected.reduce((sum, p) => sum + p.price * (quantities[p.id] ?? 0), 0)
+  useEffect(() => {
+    fetch('http://localhost:3000/api/products')
+      .then((r) => r.json())
+      .then((data: Product[]) => {
+        setProducts(data)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
 
-  function inc(id: string) {
-    setQuantities((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))
+  const selected = products.filter((p) => (quantities[p.id] || 0) > 0)
+  const total = selected.reduce((sum, p) => sum + Number(p.price) * (quantities[p.id] || 0), 0)
+
+  function inc(id: number) {
+    setQuantities((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
   }
 
-  function dec(id: string) {
+  function dec(id: number) {
     setQuantities((prev) => {
-      const next = (prev[id] ?? 0) - 1
+      const next = (prev[id] || 0) - 1
       if (next <= 0) {
         const { [id]: _, ...rest } = prev
         return rest
@@ -97,14 +111,41 @@ export default function OrderPage() {
     return e
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const e2 = validate()
-    if (Object.keys(e2).length) {
-      setErrors(e2)
+    const errs = validate()
+    if (Object.keys(errs).length) {
+      setErrors(errs)
       return
     }
-    setSubmitted(true)
+
+    const items: OrderItem[] = selected.map((p) => ({
+      product_id: p.id,
+      name: p.name,
+      price: Number(p.price),
+      quantity: quantities[p.id],
+      subtotal: Number(p.price) * quantities[p.id],
+    }))
+
+    setSubmitting(true)
+    try {
+      await fetch('http://localhost:3000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: form.fullName,
+          phone: form.phone,
+          email: form.email,
+          city: form.city,
+          post_branch: form.postBranch,
+          total,
+          items,
+        }),
+      })
+      setSubmitted(true)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function reset() {
@@ -148,44 +189,48 @@ export default function OrderPage() {
           {errors.noProducts && (
             <p className="text-xs text-red-500 mb-1">{o.products.noSelected}</p>
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {PRODUCTS.map((p) => {
-              const qty = quantities[p.id] || 0
-              const active = qty > 0
-              return (
-                <div
-                  key={p.id}
-                  className={`rounded-xl border p-4 flex flex-col gap-3 transition-colors ${
-                    active
-                      ? 'border-violet-400 dark:border-violet-600 bg-violet-50 dark:bg-violet-950/30'
-                      : 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100 leading-tight">
-                        {p.name}
-                      </p>
-                      <Chip size="sm" color="default" className="mt-1 text-[10px]">
-                        {p.category}
-                      </Chip>
-                    </div>
-                    <span className="text-sm font-bold text-violet-700 dark:text-violet-300 shrink-0">
-                      ${p.price.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <QtyControl qty={qty} onInc={() => inc(p.id)} onDec={() => dec(p.id)} />
-                    {active && (
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                        = ${(p.price * qty).toFixed(2)}
+          {loading ? (
+            <p className="text-sm text-zinc-400 py-6 text-center">...</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {products.map((p) => {
+                const qty = quantities[p.id] || 0
+                const active = qty > 0
+                return (
+                  <div
+                    key={p.id}
+                    className={`rounded-xl border p-4 flex flex-col gap-3 transition-colors ${
+                      active
+                        ? 'border-violet-400 dark:border-violet-600 bg-violet-50 dark:bg-violet-950/30'
+                        : 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100 leading-tight">
+                          {p.name}
+                        </p>
+                        <Chip size="sm" color="default" className="mt-1 text-[10px]">
+                          {p.category}
+                        </Chip>
+                      </div>
+                      <span className="text-sm font-bold text-violet-700 dark:text-violet-300 shrink-0">
+                        ${Number(p.price).toFixed(2)}
                       </span>
-                    )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <QtyControl qty={qty} onInc={() => inc(p.id)} onDec={() => dec(p.id)} />
+                      {active && (
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                          = ${(Number(p.price) * qty).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
 
           {selected.length > 0 && (
             <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
@@ -308,7 +353,8 @@ export default function OrderPage() {
             <div className="flex justify-end pt-2">
               <button
                 type="submit"
-                className="px-8 py-2.5 rounded-lg bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700 transition-colors"
+                disabled={submitting}
+                className="px-8 py-2.5 rounded-lg bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700 transition-colors disabled:opacity-60"
               >
                 {o.form.submit}
               </button>

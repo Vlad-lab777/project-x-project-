@@ -90,5 +90,40 @@ app.delete('/api/clients/:id', async (req, res) => {
   res.status(204).end()
 })
 
+// Orders
+app.get('/api/orders', async (req, res) => {
+  const orders = await sql`SELECT * FROM orders ORDER BY created_at DESC`
+  res.json(orders)
+})
+
+app.post('/api/orders', async (req, res) => {
+  const { full_name, phone, email = '', city, post_branch, total, items } = req.body
+
+  if (!full_name || !phone || !city || !post_branch || total == null || !items?.length) {
+    return res.status(400).json({ error: 'full_name, phone, city, post_branch, total, items are required' })
+  }
+
+  const [order] = await sql`
+    INSERT INTO orders (full_name, phone, email, city, post_branch, total)
+    VALUES (${full_name}, ${phone}, ${email}, ${city}, ${post_branch}, ${total})
+    RETURNING *
+  `
+
+  for (const item of items) {
+    await sql`
+      INSERT INTO order_items (order_id, product_id, name, price, quantity, subtotal)
+      VALUES (${order.id}, ${item.product_id}, ${item.name}, ${item.price}, ${item.quantity}, ${item.subtotal})
+    `
+  }
+
+  res.status(201).json(order)
+})
+
+app.delete('/api/orders/:id', async (req, res) => {
+  const { id } = req.params
+  await sql`DELETE FROM orders WHERE id = ${id}`
+  res.status(204).end()
+})
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
