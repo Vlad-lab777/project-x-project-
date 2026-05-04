@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import {
   Card,
   CardContent,
@@ -56,19 +56,7 @@ const EMPTY_STAFF: StaffForm = {
   status: 'active',
 }
 
-const STAFF_KEY = 'px_staff'
-
-function loadStaff(): StaffMember[] {
-  try {
-    return JSON.parse(localStorage.getItem(STAFF_KEY) || '[]')
-  } catch {
-    return []
-  }
-}
-
-function saveStaff(list: StaffMember[]) {
-  localStorage.setItem(STAFF_KEY, JSON.stringify(list))
-}
+const API = 'http://localhost:3000/api/staff'
 
 function validateStaff(form: StaffForm, errors_i18n: Record<string, string>): StaffErrors {
   const errors: StaffErrors = {}
@@ -97,12 +85,18 @@ function StaffTab() {
   const { t } = useI18n()
   const ts = t.settings.staff as Record<string, any>
 
-  const [staff, setStaff] = useState<StaffMember[]>(loadStaff)
+  const [staff, setStaff] = useState<StaffMember[]>([])
   const [showModal, setShowModal] = useState(false)
   const [editMember, setEditMember] = useState<StaffMember | null>(null)
   const [form, setForm] = useState<StaffForm>(EMPTY_STAFF)
   const [errors, setErrors] = useState<StaffErrors>({})
   const [deleteId, setDeleteId] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch(API)
+      .then((r) => r.json())
+      .then((data: StaffMember[]) => setStaff(data))
+  }, [])
 
   function openAdd() {
     setEditMember(null)
@@ -131,31 +125,38 @@ function StaffTab() {
     setErrors((prev) => ({ ...prev, [field]: fieldError }))
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const validation = validateStaff(form, ts.errors)
     if (Object.keys(validation).length > 0) {
       setErrors(validation)
       return
     }
-    let next: StaffMember[]
     if (editMember) {
-      next = staff.map((m) => (m.id === editMember.id ? { ...editMember, ...form } : m))
+      const res = await fetch(`${API}/${editMember.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const updated: StaffMember = await res.json()
+      setStaff(staff.map((m) => (m.id === updated.id ? updated : m)))
     } else {
-      const id = Date.now()
-      next = [{ id, ...form }, ...staff]
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const created: StaffMember = await res.json()
+      setStaff([created, ...staff])
     }
-    saveStaff(next)
-    setStaff(next)
     setShowModal(false)
     setEditMember(null)
     setForm(EMPTY_STAFF)
   }
 
-  function handleDelete() {
-    const next = staff.filter((m) => m.id !== deleteId)
-    saveStaff(next)
-    setStaff(next)
+  async function handleDelete() {
+    await fetch(`${API}/${deleteId}`, { method: 'DELETE' })
+    setStaff(staff.filter((m) => m.id !== deleteId))
     setDeleteId(null)
   }
 
