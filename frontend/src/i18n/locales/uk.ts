@@ -185,6 +185,20 @@ const uk = {
     },
   },
 
+  // Login
+  login: {
+    title: 'Вхід',
+    subtitle: 'Увійдіть до панелі керування',
+    email: 'Email',
+    emailPlaceholder: 'example@email.com',
+    password: 'Пароль',
+    passwordPlaceholder: '••••••••',
+    submit: 'Увійти',
+    invalid: 'Невірний email або пароль',
+    emailRequired: "Email обов'язковий",
+    passwordRequired: "Пароль обов'язковий",
+  },
+
   // Settings
   settings: {
     title: 'Налаштування',
@@ -228,6 +242,13 @@ const uk = {
         email: 'Email',
         emailPlaceholder: 'example@email.com',
         status: 'Статус',
+        avatar: 'Фото',
+        avatarHint: 'JPG, PNG до 2 МБ',
+        password: 'Пароль',
+        passwordPlaceholder: '••••••••',
+        confirmPassword: 'Підтвердження пароля',
+        confirmPasswordPlaceholder: '••••••••',
+        passwordHint: 'Залиште порожнім, щоб не змінювати',
         submit: 'Зберегти',
         cancel: 'Скасувати',
       },
@@ -237,7 +258,11 @@ const uk = {
         fullNameInvalid: 'ПІБ може містити лише літери, пробіли та дефіс',
         phoneRequired: "Телефон обов'язкове поле",
         phoneInvalid: 'Введіть коректний номер телефону',
+        emailRequired: "Email обов'язковий",
         emailInvalid: 'Введіть коректний email',
+        passwordRequired: "Пароль обов'язковий при створенні",
+        passwordMin: 'Пароль мінімум 6 символів',
+        passwordMismatch: 'Паролі не співпадають',
       },
       deleteConfirm: 'Ви впевнені, що хочете видалити цього співробітника?',
     },
