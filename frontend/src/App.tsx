@@ -9,10 +9,28 @@ import SettingsPage from './pages/SettingsPage'
 import ProductsPage from './pages/ProductsPage'
 import OrderPage from './pages/OrderPage'
 import ClientsPage from './pages/ClientsPage'
+import LoginPage from './pages/LoginPage'
 import { stats } from './data/mockData'
 import { Button, Input } from '@heroui/react'
 import { useSettings } from './context/SettingsContext'
 import { useI18n } from './i18n/context'
+
+const AUTH_KEY = 'px_auth'
+
+interface AuthUser {
+  id: number
+  full_name: string
+  role: string
+  email: string
+}
+
+function getStoredUser(): AuthUser | null {
+  try {
+    return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null')
+  } catch {
+    return null
+  }
+}
 
 const CHART_ROW = ['revenueChart', 'topProducts']
 const BOTTOM_ROW = ['ordersTable', 'activityFeed']
@@ -89,8 +107,25 @@ function DashboardContent() {
 
 function App() {
   const { t, locale, setLocale } = useI18n()
+  const [user, setUser] = useState<AuthUser | null>(getStoredUser)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [currentPage, setCurrentPage] = useState('dashboard')
+
+  if (!user) {
+    return (
+      <LoginPage
+        onLogin={(u) => {
+          localStorage.setItem(AUTH_KEY, JSON.stringify(u))
+          setUser(u)
+        }}
+      />
+    )
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(AUTH_KEY)
+    setUser(null)
+  }
 
   const isSettings = currentPage === 'settings'
   const isProducts = currentPage === 'products'
@@ -150,6 +185,13 @@ function App() {
                 {t.header.newOrder}
               </Button>
             )}
+            <button
+              onClick={handleLogout}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              title={user.full_name}
+            >
+              ↩
+            </button>
           </div>
         </header>
 

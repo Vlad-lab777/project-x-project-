@@ -32,6 +32,7 @@ interface StaffMember {
   phone: string
   email: string
   status: StaffStatus
+  avatar: string | null
 }
 
 interface StaffForm {
@@ -40,12 +41,15 @@ interface StaffForm {
   phone: string
   email: string
   status: StaffStatus
+  avatar: string | null
 }
 
 interface StaffErrors {
   full_name?: string
   phone?: string
   email?: string
+  password?: string
+  confirmPassword?: string
 }
 
 const EMPTY_STAFF: StaffForm = {
@@ -54,11 +58,18 @@ const EMPTY_STAFF: StaffForm = {
   phone: '',
   email: '',
   status: 'active',
+  avatar: null,
 }
 
 const API = 'http://localhost:3000/api/staff'
 
-function validateStaff(form: StaffForm, errors_i18n: Record<string, string>): StaffErrors {
+function validateStaff(
+  form: StaffForm,
+  password: string,
+  confirmPassword: string,
+  isEdit: boolean,
+  errors_i18n: Record<string, string>,
+): StaffErrors {
   const errors: StaffErrors = {}
   const nameParts = form.full_name.trim().split(/\s+/)
   if (!form.full_name.trim()) {
@@ -73,8 +84,18 @@ function validateStaff(form: StaffForm, errors_i18n: Record<string, string>): St
   } else if (!/^\+?[\d\s\-()]{7,15}$/.test(form.phone.trim())) {
     errors.phone = errors_i18n.phoneInvalid
   }
-  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+  if (!form.email.trim()) {
+    errors.email = errors_i18n.emailRequired
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
     errors.email = errors_i18n.emailInvalid
+  }
+  if (!isEdit && !password.trim()) {
+    errors.password = errors_i18n.passwordRequired
+  } else if (password.trim() && password.length < 6) {
+    errors.password = errors_i18n.passwordMin
+  }
+  if (password.trim() && password !== confirmPassword) {
+    errors.confirmPassword = errors_i18n.passwordMismatch
   }
   return errors
 }
@@ -89,7 +110,11 @@ function StaffTab() {
   const [showModal, setShowModal] = useState(false)
   const [editMember, setEditMember] = useState<StaffMember | null>(null)
   const [form, setForm] = useState<StaffForm>(EMPTY_STAFF)
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [errors, setErrors] = useState<StaffErrors>({})
+  const [serverError, setServerError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
   const [deleteId, setDeleteId] = useState<number | null>(null)
 
   useEffect(() => {
@@ -101,7 +126,10 @@ function StaffTab() {
   function openAdd() {
     setEditMember(null)
     setForm(EMPTY_STAFF)
+    setPassword('')
+    setConfirmPassword('')
     setErrors({})
+    setServerError(null)
     setShowModal(true)
   }
 
@@ -113,45 +141,62 @@ function StaffTab() {
       phone: member.phone,
       email: member.email || '',
       status: member.status,
+      avatar: member.avatar ?? null,
     })
+    setPassword('')
+    setConfirmPassword('')
     setErrors({})
+    setServerError(null)
     setShowModal(true)
   }
 
   function handleChange(field: keyof StaffForm, value: string) {
     const updated = { ...form, [field]: value } as StaffForm
     setForm(updated)
-    const fieldError = validateStaff(updated, ts.errors)[field as keyof StaffErrors]
+    const fieldError = validateStaff(updated, password, confirmPassword, !!editMember, ts.errors)[field as keyof StaffErrors]
     setErrors((prev) => ({ ...prev, [field]: fieldError }))
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    const validation = validateStaff(form, ts.errors)
+    const validation = validateStaff(form, password, confirmPassword, !!editMember, ts.errors)
     if (Object.keys(validation).length > 0) {
       setErrors(validation)
       return
     }
-    if (editMember) {
-      const res = await fetch(`${API}/${editMember.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const updated: StaffMember = await res.json()
-      setStaff(staff.map((m) => (m.id === updated.id ? updated : m)))
-    } else {
-      const res = await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const created: StaffMember = await res.json()
-      setStaff([created, ...staff])
+    setSubmitting(true)
+    setServerError(null)
+    try {
+      const payload = { ...form, ...(password ? { password } : {}) }
+      if (editMember) {
+        const res = await fetch(`${API}/${editMember.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) { setServerError((await res.json()).error ?? 'Помилка сервера'); return }
+        const updated: StaffMember = await res.json()
+        setStaff(staff.map((m) => (m.id === updated.id ? updated : m)))
+      } else {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) { setServerError((await res.json()).error ?? 'Помилка сервера'); return }
+        const created: StaffMember = await res.json()
+        setStaff([created, ...staff])
+      }
+      setShowModal(false)
+      setEditMember(null)
+      setForm(EMPTY_STAFF)
+      setPassword('')
+      setConfirmPassword('')
+    } catch {
+      setServerError('Не вдалося зʼєднатися з сервером')
+    } finally {
+      setSubmitting(false)
     }
-    setShowModal(false)
-    setEditMember(null)
-    setForm(EMPTY_STAFF)
   }
 
   async function handleDelete() {
@@ -194,17 +239,25 @@ function StaffTab() {
                   key={member.id}
                   className="flex items-center gap-3 px-3 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700"
                 >
-                  <Avatar size="sm" color="accent" aria-label={member.full_name}>
-                    <AvatarFallback>
-                      {member.full_name
-                        .trim()
-                        .split(/\s+/)
-                        .slice(0, 2)
-                        .map((w) => w[0])
-                        .join('')
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  {member.avatar ? (
+                    <img
+                      src={member.avatar}
+                      alt={member.full_name}
+                      className="w-8 h-8 rounded-full object-cover shrink-0"
+                    />
+                  ) : (
+                    <Avatar size="sm" color="accent" aria-label={member.full_name}>
+                      <AvatarFallback>
+                        {member.full_name
+                          .trim()
+                          .split(/\s+/)
+                          .slice(0, 2)
+                          .map((w) => w[0])
+                          .join('')
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
 
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-100 truncate">
@@ -301,6 +354,56 @@ function StaffTab() {
             </div>
 
             <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
+              {serverError && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3">
+                  <p className="text-sm text-red-600 dark:text-red-400">{serverError}</p>
+                </div>
+              )}
+              {/* Avatar */}
+              <div className="flex items-center gap-4">
+                <div className="shrink-0">
+                  {form.avatar ? (
+                    <img
+                      src={form.avatar}
+                      alt="avatar"
+                      className="w-14 h-14 rounded-full object-cover border-2 border-violet-200 dark:border-violet-800"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-600 flex items-center justify-center text-zinc-400 text-xs">
+                      ?
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                    {ts.modal.avatar}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      if (file.size > 2 * 1024 * 1024) return
+                      const reader = new FileReader()
+                      reader.onload = () => setForm((prev) => ({ ...prev, avatar: reader.result as string }))
+                      reader.readAsDataURL(file)
+                    }}
+                    className="w-full text-xs text-zinc-500 dark:text-zinc-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-50 file:text-violet-700 dark:file:bg-violet-900/30 dark:file:text-violet-300 hover:file:bg-violet-100 transition-colors"
+                  />
+                  <p className="text-[10px] text-zinc-400 mt-0.5">{ts.modal.avatarHint}</p>
+                  {form.avatar && (
+                    <button
+                      type="button"
+                      onClick={() => setForm((prev) => ({ ...prev, avatar: null }))}
+                      className="text-[10px] text-red-400 hover:text-red-600 mt-0.5 transition-colors"
+                    >
+                      Видалити фото
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {/* Full name */}
               <div>
                 <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
@@ -371,7 +474,7 @@ function StaffTab() {
               {/* Email */}
               <div>
                 <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
-                  {ts.modal.email}
+                  {ts.modal.email} *
                 </label>
                 <input
                   type="email"
@@ -381,6 +484,49 @@ function StaffTab() {
                   className={`w-full bg-zinc-50 dark:bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors ${errors.email ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}`}
                 />
                 {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+              </div>
+
+              {/* Password */}
+              <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 flex flex-col gap-3">
+                {editMember && (
+                  <p className="text-[11px] text-zinc-400">{ts.modal.passwordHint}</p>
+                )}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                      {ts.modal.password}{!editMember ? ' *' : ''}
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                        setErrors((prev) => ({ ...prev, password: undefined, confirmPassword: undefined }))
+                      }}
+                      placeholder={ts.modal.passwordPlaceholder}
+                      autoComplete="new-password"
+                      className={`w-full bg-zinc-50 dark:bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors ${errors.password ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}`}
+                    />
+                    {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                      {ts.modal.confirmPassword}{!editMember ? ' *' : ''}
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value)
+                        setErrors((prev) => ({ ...prev, confirmPassword: undefined }))
+                      }}
+                      placeholder={ts.modal.confirmPasswordPlaceholder}
+                      autoComplete="new-password"
+                      className={`w-full bg-zinc-50 dark:bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:border-violet-500 transition-colors ${errors.confirmPassword ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}`}
+                    />
+                    {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-2 justify-end pt-1">
@@ -393,9 +539,10 @@ function StaffTab() {
                 </button>
                 <button
                   type="submit"
-                  className="text-sm px-4 py-2 rounded-lg bg-violet-600 text-white font-semibold hover:bg-violet-700 transition-colors"
+                  disabled={submitting}
+                  className="text-sm px-4 py-2 rounded-lg bg-violet-600 text-white font-semibold hover:bg-violet-700 disabled:opacity-60 transition-colors"
                 >
-                  {ts.modal.submit}
+                  {submitting ? '...' : ts.modal.submit}
                 </button>
               </div>
             </form>

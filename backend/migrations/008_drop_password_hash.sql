@@ -1,0 +1,1 @@
+ALTER TABLE staff DROP COLUMN IF EXISTS password_hash;

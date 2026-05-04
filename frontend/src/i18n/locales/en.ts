@@ -185,6 +185,20 @@ const en = {
     },
   },
 
+  // Login
+  login: {
+    title: 'Sign in',
+    subtitle: 'Sign in to your dashboard',
+    email: 'Email',
+    emailPlaceholder: 'example@email.com',
+    password: 'Password',
+    passwordPlaceholder: '••••••••',
+    submit: 'Sign in',
+    invalid: 'Invalid email or password',
+    emailRequired: 'Email is required',
+    passwordRequired: 'Password is required',
+  },
+
   // Settings
   settings: {
     title: 'Settings',
@@ -228,6 +242,13 @@ const en = {
         email: 'Email',
         emailPlaceholder: 'example@email.com',
         status: 'Status',
+        avatar: 'Photo',
+        avatarHint: 'JPG, PNG up to 2 MB',
+        password: 'Password',
+        passwordPlaceholder: '••••••••',
+        confirmPassword: 'Confirm password',
+        confirmPasswordPlaceholder: '••••••••',
+        passwordHint: 'Leave blank to keep current password',
         submit: 'Save',
         cancel: 'Cancel',
       },
@@ -237,7 +258,11 @@ const en = {
         fullNameInvalid: 'Name can only contain letters, spaces and hyphens',
         phoneRequired: 'Phone is required',
         phoneInvalid: 'Enter a valid phone number',
+        emailRequired: 'Email is required',
         emailInvalid: 'Enter a valid email',
+        passwordRequired: 'Password is required when creating a member',
+        passwordMin: 'Password must be at least 6 characters',
+        passwordMismatch: 'Passwords do not match',
       },
       deleteConfirm: 'Are you sure you want to delete this staff member?',
     },

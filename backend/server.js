@@ -7,7 +7,7 @@ const app = express()
 const sql = neon(process.env.DATABASE_URL)
 
 app.use(cors())
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 
 app.post('/api/products', async (req, res) => {
   const { name, category, price, stock, description = '' } = req.body
@@ -125,42 +125,79 @@ app.delete('/api/orders/:id', async (req, res) => {
   res.status(204).end()
 })
 
+// Auth
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'email and password are required' })
+  }
+
+  const [member] = await sql`SELECT * FROM staff WHERE email = ${email} AND status = 'active'`
+  if (!member || !member.password) {
+    return res.status(401).json({ error: 'Invalid credentials' })
+  }
+
+  if (member.password !== password) {
+    return res.status(401).json({ error: 'Invalid credentials' })
+  }
+
+  const { password: _pw, ...safe } = member
+  res.json(safe)
+})
+
 // Staff
 app.get('/api/staff', async (req, res) => {
-  const members = await sql`SELECT * FROM staff ORDER BY created_at DESC`
+  const members = await sql`SELECT id, full_name, role, phone, email, status, avatar, created_at FROM staff ORDER BY created_at DESC`
   res.json(members)
 })
 
 app.post('/api/staff', async (req, res) => {
-  const { full_name, role, phone, email = '', status = 'active' } = req.body
+  const { full_name, role, phone, email = '', status = 'active', password, avatar = null } = req.body
 
-  if (!full_name || !role || !phone) {
-    return res.status(400).json({ error: 'full_name, role and phone are required' })
+  if (!full_name || !role || !phone || !email) {
+    return res.status(400).json({ error: 'full_name, role, phone and email are required' })
+  }
+
+  if (!password) {
+    return res.status(400).json({ error: 'password is required' })
   }
 
   const [member] = await sql`
-    INSERT INTO staff (full_name, role, phone, email, status)
-    VALUES (${full_name}, ${role}, ${phone}, ${email}, ${status})
-    RETURNING *
+    INSERT INTO staff (full_name, role, phone, email, status, password, avatar)
+    VALUES (${full_name}, ${role}, ${phone}, ${email}, ${status}, ${password}, ${avatar})
+    RETURNING id, full_name, role, phone, email, status, avatar, created_at
   `
   res.status(201).json(member)
 })
 
 app.put('/api/staff/:id', async (req, res) => {
   const { id } = req.params
-  const { full_name, role, phone, email = '', status } = req.body
+  const { full_name, role, phone, email = '', status, password, avatar = null } = req.body
 
-  if (!full_name || !role || !phone) {
-    return res.status(400).json({ error: 'full_name, role and phone are required' })
+  if (!full_name || !role || !phone || !email) {
+    return res.status(400).json({ error: 'full_name, role, phone and email are required' })
   }
 
-  const [member] = await sql`
-    UPDATE staff
-    SET full_name = ${full_name}, role = ${role}, phone = ${phone},
-        email = ${email}, status = ${status}
-    WHERE id = ${id}
-    RETURNING *
-  `
+  let member
+  if (password) {
+    ;[member] = await sql`
+      UPDATE staff
+      SET full_name = ${full_name}, role = ${role}, phone = ${phone},
+          email = ${email}, status = ${status}, password = ${password}, avatar = ${avatar}
+      WHERE id = ${id}
+      RETURNING id, full_name, role, phone, email, status, avatar, created_at
+    `
+  } else {
+    ;[member] = await sql`
+      UPDATE staff
+      SET full_name = ${full_name}, role = ${role}, phone = ${phone},
+          email = ${email}, status = ${status}, avatar = ${avatar}
+      WHERE id = ${id}
+      RETURNING id, full_name, role, phone, email, status, avatar, created_at
+    `
+  }
+
   if (!member) return res.status(404).json({ error: 'Staff member not found' })
   res.json(member)
 })
