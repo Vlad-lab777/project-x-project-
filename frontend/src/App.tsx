@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import StatCard from './components/StatCard'
 import RevenueChart from './components/RevenueChart'
@@ -10,7 +10,6 @@ import ProductsPage from './pages/ProductsPage'
 import OrderPage from './pages/OrderPage'
 import ClientsPage from './pages/ClientsPage'
 import LoginPage from './pages/LoginPage'
-import { stats } from './data/mockData'
 import { Button, Input } from '@heroui/react'
 import { useSettings } from './context/SettingsContext'
 import { useI18n } from './i18n/context'
@@ -32,12 +31,28 @@ function getStoredUser(): AuthUser | null {
   }
 }
 
+interface DashboardStats {
+  totalRevenue: number
+  totalOrders: number
+  totalClients: number
+  revenueChange: number
+  ordersChange: number
+}
+
 const CHART_ROW = ['revenueChart', 'topProducts']
 const BOTTOM_ROW = ['ordersTable', 'activityFeed']
 
 function DashboardContent() {
   const { settings } = useSettings()
   const { visibleWidgets, widgetOrder } = settings.dashboard
+  const [apiStats, setApiStats] = useState<DashboardStats | null>(null)
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/stats')
+      .then((r) => r.json())
+      .then(setApiStats)
+      .catch(() => {})
+  }, [])
 
   const isVisible = (id: string) => visibleWidgets.includes(id)
 
@@ -48,12 +63,38 @@ function DashboardContent() {
   const chartVisible = orderedVisible(CHART_ROW)
   const bottomVisible = orderedVisible(BOTTOM_ROW)
 
+  const statCards = apiStats
+    ? [
+        {
+          labelKey: 'totalRevenue',
+          value: `$${apiStats.totalRevenue.toFixed(0)}`,
+          change: `${Math.abs(apiStats.revenueChange)}%`,
+          trend: (apiStats.revenueChange >= 0 ? 'up' : 'down') as 'up' | 'down',
+          icon: '💰',
+        },
+        {
+          labelKey: 'orders',
+          value: String(apiStats.totalOrders),
+          change: `${Math.abs(apiStats.ordersChange)}%`,
+          trend: (apiStats.ordersChange >= 0 ? 'up' : 'down') as 'up' | 'down',
+          icon: '📦',
+        },
+        {
+          labelKey: 'activeUsers',
+          value: String(apiStats.totalClients),
+          change: '—',
+          trend: 'up' as 'up' | 'down',
+          icon: '👥',
+        },
+      ]
+    : []
+
   return (
     <div className="px-4 sm:px-6 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6">
-      {isVisible('stats') && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {stats.map((stat) => (
-            <StatCard key={stat.labelKey} {...stat} />
+      {isVisible('stats') && statCards.length > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {statCards.map((stat, i) => (
+            <StatCard key={stat.labelKey} {...stat} delay={i * 100} />
           ))}
         </div>
       )}
@@ -151,7 +192,7 @@ function App() {
           : t.header.welcome
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans">
+    <div className="flex min-h-screen bg-gradient-to-br from-zinc-50 via-violet-50/10 to-zinc-50 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-950 font-sans">
       <Sidebar
         open={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
@@ -160,7 +201,7 @@ function App() {
       />
 
       <main className="flex-1 overflow-auto min-w-0 ml-14 lg:ml-0">
-        <header className="sticky top-0 z-10 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 flex items-center gap-3">
+        <header className="sticky top-0 z-10 bg-white/70 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <h1 className="text-base font-bold text-zinc-900 dark:text-white leading-tight">
               {pageTitle}
