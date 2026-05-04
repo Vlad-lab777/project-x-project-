@@ -125,5 +125,51 @@ app.delete('/api/orders/:id', async (req, res) => {
   res.status(204).end()
 })
 
+// Staff
+app.get('/api/staff', async (req, res) => {
+  const members = await sql`SELECT * FROM staff ORDER BY created_at DESC`
+  res.json(members)
+})
+
+app.post('/api/staff', async (req, res) => {
+  const { full_name, role, phone, email = '', status = 'active' } = req.body
+
+  if (!full_name || !role || !phone) {
+    return res.status(400).json({ error: 'full_name, role and phone are required' })
+  }
+
+  const [member] = await sql`
+    INSERT INTO staff (full_name, role, phone, email, status)
+    VALUES (${full_name}, ${role}, ${phone}, ${email}, ${status})
+    RETURNING *
+  `
+  res.status(201).json(member)
+})
+
+app.put('/api/staff/:id', async (req, res) => {
+  const { id } = req.params
+  const { full_name, role, phone, email = '', status } = req.body
+
+  if (!full_name || !role || !phone) {
+    return res.status(400).json({ error: 'full_name, role and phone are required' })
+  }
+
+  const [member] = await sql`
+    UPDATE staff
+    SET full_name = ${full_name}, role = ${role}, phone = ${phone},
+        email = ${email}, status = ${status}
+    WHERE id = ${id}
+    RETURNING *
+  `
+  if (!member) return res.status(404).json({ error: 'Staff member not found' })
+  res.json(member)
+})
+
+app.delete('/api/staff/:id', async (req, res) => {
+  const { id } = req.params
+  await sql`DELETE FROM staff WHERE id = ${id}`
+  res.status(204).end()
+})
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
