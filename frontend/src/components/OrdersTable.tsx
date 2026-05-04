@@ -11,7 +11,7 @@ import {
   TableCell,
   Chip,
 } from '@heroui/react'
-import { recentOrders } from '../data/mockData'
+import { useEffect, useState } from 'react'
 import { useI18n } from '../i18n/context'
 
 type OrderStatus = 'paid' | 'pending' | 'failed'
@@ -22,8 +22,24 @@ const statusColor: Record<OrderStatus, 'success' | 'warning' | 'danger'> = {
   failed: 'danger',
 }
 
+interface RecentOrder {
+  id: number
+  full_name: string
+  total: string
+  status: string
+  product_name: string | null
+}
+
 export default function OrdersTable() {
   const { t } = useI18n()
+  const [orders, setOrders] = useState<RecentOrder[]>([])
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/orders/recent')
+      .then((r) => r.json())
+      .then(setOrders)
+      .catch(() => {})
+  }, [])
 
   return (
     <Card className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
@@ -59,19 +75,21 @@ export default function OrdersTable() {
               </TableColumn>
             </TableHeader>
             <TableBody>
-              {recentOrders.map((order) => (
-                <TableRow key={order.id} id={order.id}>
-                  <TableCell className="text-xs font-mono text-zinc-500">{order.id}</TableCell>
+              {orders.map((order) => (
+                <TableRow key={order.id} id={String(order.id)}>
+                  <TableCell className="text-xs font-mono text-zinc-500">#{order.id}</TableCell>
                   <TableCell className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
-                    {order.customer}
+                    {order.full_name}
                   </TableCell>
-                  <TableCell className="text-xs text-zinc-500">{order.product}</TableCell>
+                  <TableCell className="text-xs text-zinc-500">
+                    {order.product_name ?? '—'}
+                  </TableCell>
                   <TableCell className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                    {order.amount}
+                    ${parseFloat(order.total).toFixed(2)}
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" color={statusColor[order.status as OrderStatus]}>
-                      {(t.ordersTable.status as Record<string, string>)[order.status]}
+                    <Chip size="sm" color={statusColor[(order.status as OrderStatus) ?? 'pending']}>
+                      {(t.ordersTable.status as Record<string, string>)[order.status] ?? order.status}
                     </Chip>
                   </TableCell>
                 </TableRow>

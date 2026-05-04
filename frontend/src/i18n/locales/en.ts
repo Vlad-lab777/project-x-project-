@@ -33,6 +33,7 @@ const en = {
     submittedTicket: 'submitted a support ticket',
     renewedLicense: 'renewed Enterprise license',
     paymentFailed: 'payment failed — retry needed',
+    placedOrder: 'placed an order',
   },
 
   // Revenue Chart

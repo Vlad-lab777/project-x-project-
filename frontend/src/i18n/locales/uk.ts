@@ -33,6 +33,7 @@ const uk = {
     submittedTicket: 'відправив запит до підтримки',
     renewedLicense: 'оновив ліцензію Enterprise',
     paymentFailed: 'помилка оплати — потрібна повторна спроба',
+    placedOrder: 'оформив замовлення',
   },
 
   // Revenue Chart
