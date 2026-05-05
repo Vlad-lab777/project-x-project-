@@ -3,15 +3,15 @@ import { createRoot } from 'react-dom/client'
 import '@heroui/react/styles'
 import './index.css'
 import App from './App'
-import { I18nProvider } from './i18n/index'
-import { SettingsProvider } from './context/SettingsContext'
+import { ThemeProvider } from './context/ThemeContext'
+import { ToastProvider } from './context/ToastContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <I18nProvider>
-      <SettingsProvider>
+    <ThemeProvider>
+      <ToastProvider>
         <App />
-      </SettingsProvider>
-    </I18nProvider>
+      </ToastProvider>
+    </ThemeProvider>
   </StrictMode>
 )
