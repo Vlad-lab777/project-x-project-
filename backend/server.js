@@ -40,6 +40,7 @@ async function migrate() {
     CREATE TABLE IF NOT EXISTS bookings (
       id          SERIAL PRIMARY KEY,
       service_id  TEXT REFERENCES services(id),
+      service_ids TEXT[]  DEFAULT '{}',
       price       INTEGER,
       name        TEXT    NOT NULL,
       phone       TEXT    NOT NULL,
@@ -54,6 +55,7 @@ async function migrate() {
       created_at  TIMESTAMPTZ DEFAULT NOW()
     )
   `
+  await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS service_ids TEXT[] DEFAULT '{}'`
 }
 
 const SEED_SERVICES = [
@@ -152,17 +154,19 @@ app.get('/api/stats', async (_req, res) => {
 
 app.post('/api/bookings', async (req, res) => {
   try {
-    const { serviceId, date, time, name, phone, email, carBrand, carModel, carYear, notes } = req.body
-    if (!serviceId || !date || !time || !name || !phone || !carBrand || !carModel) {
+    const { serviceIds, date, time, name, phone, email, carBrand, carModel, carYear, notes } = req.body
+    if (!Array.isArray(serviceIds) || serviceIds.length === 0 || !date || !time || !name || !phone || !carBrand || !carModel) {
       return res.status(400).json({ error: 'Missing required fields' })
     }
 
-    const [service] = await sql`SELECT price FROM services WHERE id = ${serviceId}`
-    if (!service) return res.status(400).json({ error: 'Service not found' })
+    const svcs = await sql`SELECT id, price FROM services WHERE id = ANY(${serviceIds})`
+    if (svcs.length !== serviceIds.length) return res.status(400).json({ error: 'Some services not found' })
+
+    const totalPrice = svcs.reduce((sum, s) => sum + s.price, 0)
 
     const [row] = await sql`
-      INSERT INTO bookings (service_id, price, name, phone, email, car_brand, car_model, car_year, date, time, notes)
-      VALUES (${serviceId}, ${service.price}, ${name}, ${phone}, ${email ?? null}, ${carBrand}, ${carModel}, ${carYear ? Number(carYear) : null}, ${date}, ${time}, ${notes ?? null})
+      INSERT INTO bookings (service_ids, price, name, phone, email, car_brand, car_model, car_year, date, time, notes)
+      VALUES (${serviceIds}, ${totalPrice}, ${name}, ${phone}, ${email ?? null}, ${carBrand}, ${carModel}, ${carYear ? Number(carYear) : null}, ${date}, ${time}, ${notes ?? null})
       RETURNING id
     `
     res.status(201).json({ id: row.id })

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api, type ApiService } from '../lib/api'
+import { SERVICE_ICONS } from '../lib/serviceIcons'
 
 const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00']
 
@@ -20,7 +21,7 @@ function formatDateUa(iso: string) {
 }
 
 interface FormData {
-  serviceId: string
+  serviceIds: string[]
   date: string
   time: string
   name: string
@@ -33,19 +34,19 @@ interface FormData {
 }
 
 const EMPTY: FormData = {
-  serviceId: '', date: '', time: '', name: '', phone: '', email: '',
+  serviceIds: [], date: '', time: '', name: '', phone: '', email: '',
   carBrand: '', carModel: '', carYear: '', notes: '',
 }
 
-type FieldError = Partial<Record<keyof FormData, string>>
+type FieldErrors = Partial<Record<keyof FormData | 'serviceIds', string>>
 
 export function BookingPage() {
   const location = useLocation()
   const preselectedId = (location.state as { serviceId?: string } | null)?.serviceId ?? ''
 
   const [services, setServices] = useState<ApiService[]>([])
-  const [form,      setForm]     = useState<FormData>({ ...EMPTY, serviceId: preselectedId })
-  const [errors,    setErrors]   = useState<FieldError>({})
+  const [form,      setForm]     = useState<FormData>({ ...EMPTY, serviceIds: preselectedId ? [preselectedId] : [] })
+  const [errors,    setErrors]   = useState<FieldErrors>({})
   const [submitting,setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
@@ -54,10 +55,22 @@ export function BookingPage() {
   }, [])
 
   useEffect(() => {
-    if (preselectedId) setForm((f) => ({ ...f, serviceId: preselectedId }))
+    if (preselectedId) setForm((f) => ({ ...f, serviceIds: [preselectedId] }))
   }, [preselectedId])
 
-  const selectedService = services.find((s) => s.id === form.serviceId)
+  const selectedServices = services.filter((s) => form.serviceIds.includes(s.id))
+  const totalPrice    = selectedServices.reduce((sum, s) => sum + s.price, 0)
+  const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0)
+
+  function toggleService(id: string) {
+    setForm((f) => ({
+      ...f,
+      serviceIds: f.serviceIds.includes(id)
+        ? f.serviceIds.filter((x) => x !== id)
+        : [...f.serviceIds, id],
+    }))
+    setErrors((e) => ({ ...e, serviceIds: undefined }))
+  }
 
   function set<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }))
@@ -65,8 +78,8 @@ export function BookingPage() {
   }
 
   function validate(): boolean {
-    const e: FieldError = {}
-    if (!form.serviceId) e.serviceId = 'Оберіть послугу'
+    const e: FieldErrors = {}
+    if (!form.serviceIds.length) e.serviceIds = 'Оберіть хоча б одну послугу'
     if (!form.date) e.date = 'Оберіть дату'
     if (!form.time) e.time = 'Оберіть час'
     if (!form.name.trim()) e.name = "Введіть ваше ім'я"
@@ -84,7 +97,7 @@ export function BookingPage() {
     setSubmitting(true)
     try {
       await api.createBooking({
-        serviceId: form.serviceId,
+        serviceIds: form.serviceIds,
         date: form.date,
         time: form.time,
         name: form.name,
@@ -103,7 +116,7 @@ export function BookingPage() {
     }
   }
 
-  if (submitted && selectedService) {
+  if (submitted) {
     return (
       <div className="min-h-screen bg-zinc-950 pt-24 pb-16 flex items-center justify-center px-4">
         <motion.div
@@ -116,16 +129,17 @@ export function BookingPage() {
           <h2 className="text-2xl font-bold text-white mb-2">Запис підтверджено!</h2>
           <p className="text-zinc-400 mb-8">Ми зв'яжемось з вами найближчим часом для підтвердження.</p>
           <div className="bg-zinc-800/50 rounded-2xl p-5 text-left space-y-3 mb-8">
-            <Row label="Послуга" value={selectedService.name} />
+            <Row label="Послуги" value={selectedServices.map((s) => s.name).join(', ')} />
             <Row label="Дата"    value={formatDateUa(form.date)} />
             <Row label="Час"     value={form.time} />
             <Row label="Клієнт"  value={form.name} />
             <Row label="Телефон" value={form.phone} />
             <Row label="Авто"    value={`${form.carBrand} ${form.carModel}${form.carYear ? ` (${form.carYear})` : ''}`} />
-            <Row label="Вартість" value={`₴${selectedService.price.toLocaleString()}`} />
+            <Row label="Тривалість" value={formatDuration(totalDuration)} />
+            <Row label="Вартість" value={`₴${totalPrice.toLocaleString()}`} />
           </div>
           <button
-            onClick={() => { setForm({ ...EMPTY, serviceId: preselectedId }); setSubmitted(false) }}
+            onClick={() => { setForm({ ...EMPTY, serviceIds: preselectedId ? [preselectedId] : [] }); setSubmitted(false) }}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-shadow"
           >
             Записатись ще раз
@@ -145,8 +159,8 @@ export function BookingPage() {
         </motion.div>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-8">
-          {/* Service */}
-          <Section title="Послуга">
+          {/* Services */}
+          <Section title="Послуги (можна обрати декілька)">
             {services.length === 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -155,32 +169,41 @@ export function BookingPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {services.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => set('serviceId', s.id)}
-                    className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
-                      form.serviceId === s.id
-                        ? 'border-blue-500 bg-blue-500/10'
-                        : 'border-zinc-700/50 bg-zinc-800/50 hover:border-zinc-600'
-                    }`}
-                  >
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center text-xl shrink-0`}>{s.icon}</div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{s.name}</p>
-                      <p className="text-xs text-zinc-500">{formatDuration(s.duration)} · ₴{s.price.toLocaleString()}</p>
-                    </div>
-                    {form.serviceId === s.id && (
-                      <div className="ml-auto w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
-                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><polyline points="1 4 3 6 7 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                {services.map((s) => {
+                  const selected = form.serviceIds.includes(s.id)
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => toggleService(s.id)}
+                      className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
+                        selected
+                          ? 'border-blue-500 bg-blue-500/10'
+                          : 'border-zinc-700/50 bg-zinc-800/50 hover:border-zinc-600'
+                      }`}
+                    >
+                      <div className={`shrink-0 transition-colors ${selected ? 'text-blue-400' : 'text-zinc-500'}`}>
+                        {SERVICE_ICONS[s.id] ?? s.icon}
                       </div>
-                    )}
-                  </button>
-                ))}
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{s.name}</p>
+                        <p className="text-xs text-zinc-500">{formatDuration(s.duration)} · ₴{s.price.toLocaleString()}</p>
+                      </div>
+                      <div className={`ml-auto w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
+                        selected ? 'bg-blue-500 border-blue-500' : 'border-zinc-600'
+                      }`}>
+                        {selected && (
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                            <polyline points="1 4 3 6 7 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             )}
-            <FieldError msg={errors.serviceId} />
+            <FieldError msg={errors.serviceIds} />
           </Section>
 
           {/* Date & Time */}
@@ -259,22 +282,33 @@ export function BookingPage() {
             />
           </Section>
 
+          {/* Summary */}
           <AnimatePresence>
-            {selectedService && (
+            {selectedServices.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
-                className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 flex items-center justify-between gap-4"
+                className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 space-y-3"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{selectedService.icon}</span>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{selectedService.name}</p>
-                    <p className="text-xs text-zinc-400">{formatDuration(selectedService.duration)}</p>
+                {selectedServices.map((s) => (
+                  <div key={s.id} className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="text-blue-400 shrink-0">{SERVICE_ICONS[s.id] ?? s.icon}</div>
+                      <div>
+                        <p className="text-sm font-medium text-white">{s.name}</p>
+                        <p className="text-xs text-zinc-400">{formatDuration(s.duration)}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm font-semibold text-white shrink-0">₴{s.price.toLocaleString()}</p>
                   </div>
-                </div>
-                <p className="text-xl font-bold text-white shrink-0">₴{selectedService.price.toLocaleString()}</p>
+                ))}
+                {selectedServices.length > 1 && (
+                  <div className="pt-3 border-t border-blue-500/20 flex items-center justify-between">
+                    <p className="text-xs text-zinc-400">Разом · {formatDuration(totalDuration)}</p>
+                    <p className="text-xl font-bold text-white">₴{totalPrice.toLocaleString()}</p>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
