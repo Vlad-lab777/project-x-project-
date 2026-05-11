@@ -31,7 +31,7 @@ export interface ApiStats {
 }
 
 export interface BookingPayload {
-  serviceId: string
+  serviceIds: string[]
   date: string
   time: string
   name: string

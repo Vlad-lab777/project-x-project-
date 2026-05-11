@@ -11,10 +11,38 @@ const fadeUp = (delay = 0) => ({
 })
 
 const USP = [
-  { icon: '🏆', title: 'Преміум якість', desc: 'Використовуємо тільки сертифіковані засоби провідних брендів Gyeon, Koch Chemie, Meguiars.' },
-  { icon: '⏱️', title: 'Точно в строк', desc: 'Поважаємо ваш час. Всі роботи виконуються у домовлені терміни без зайвого очікування.' },
-  { icon: '🛡️', title: 'Гарантія результату', desc: 'Надаємо гарантію на керамічне покриття до 3 років. Будемо раді, якщо ви повернетесь.' },
-  { icon: '📍', title: 'Зручне розташування', desc: 'Знаходимось в центрі міста. Зручне паркування та трансфер до зупинки.' },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+    ),
+    title: 'Преміум якість', desc: 'Використовуємо тільки сертифіковані засоби провідних брендів Gyeon, Koch Chemie, Meguiars.',
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+    ),
+    title: 'Точно в строк', desc: 'Поважаємо ваш час. Всі роботи виконуються у домовлені терміни без зайвого очікування.',
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+    title: 'Гарантія результату', desc: 'Надаємо гарантію на керамічне покриття до 3 років. Будемо раді, якщо ви повернетесь.',
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+    ),
+    title: 'Зручне розташування', desc: 'Знаходимось в центрі міста. Зручне паркування та трансфер до зупинки.',
+  },
 ]
 
 const AVATAR_GRADIENTS = [
@@ -179,7 +207,7 @@ export function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {USP.map(({ icon, title, desc }, i) => (
               <motion.div key={title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} whileHover={{ y: -4 }} className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/20 flex items-center justify-center text-2xl mb-4">{icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4">{icon}</div>
                 <h3 className="text-sm font-semibold text-white mb-2">{title}</h3>
                 <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
               </motion.div>
