@@ -1,36 +1,24 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Layout } from './components/Layout'
-import { ProtectedRoute } from './components/ProtectedRoute'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Navbar } from './components/Navbar'
+import { Footer } from './components/Footer'
 import { ToastContainer } from './components/ui/Toast'
-import { LoginPage } from './features/auth/LoginPage'
-import { DashboardPage } from './features/dashboard/DashboardPage'
-import { BookingsPage } from './features/bookings/BookingsPage'
-import { ServicesPage } from './features/services/ServicesPage'
-import { ReviewsPage } from './features/reviews/ReviewsPage'
+import { HomePage } from './pages/HomePage'
+import { ServicesPage } from './pages/ServicesPage'
+import { BookingPage } from './pages/BookingPage'
+import { ReviewsPage } from './pages/ReviewsPage'
 
 export default function App() {
   return (
     <BrowserRouter>
       <ToastContainer />
+      <Navbar />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/*"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<DashboardPage />} />
-                  <Route path="/bookings" element={<BookingsPage />} />
-                  <Route path="/services" element={<ServicesPage />} />
-                  <Route path="/reviews" element={<ReviewsPage />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/reviews" element={<ReviewsPage />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   )
 }
