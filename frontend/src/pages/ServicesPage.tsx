@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { api, type ApiService } from '../lib/api'
+import { SERVICE_IMAGES } from '../lib/serviceImages'
 import type { ServiceCategory } from '../types'
 
 const CATEGORY_LABELS: Record<ServiceCategory | 'all', string> = {
@@ -88,8 +89,19 @@ export function ServicesPage() {
                 whileHover={{ y: -4 }}
                 className="bg-zinc-900 border border-zinc-800/60 rounded-2xl overflow-hidden group flex flex-col"
               >
-                <div className={`h-32 bg-gradient-to-br ${s.gradient} flex items-center justify-center shrink-0`}>
-                  <span className="text-5xl drop-shadow-xl group-hover:scale-110 transition-transform duration-300">{s.icon}</span>
+                <div className="h-40 relative overflow-hidden shrink-0">
+                  {SERVICE_IMAGES[s.id] ? (
+                    <img
+                      src={SERVICE_IMAGES[s.id]}
+                      alt={s.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className={`w-full h-full bg-gradient-to-br ${s.gradient} flex items-center justify-center`}>
+                      <span className="text-5xl">{s.icon}</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/60 to-transparent" />
                 </div>
                 <div className="p-5 flex flex-col flex-1">
                   <h3 className="text-sm font-semibold text-white mb-1">{s.name}</h3>
