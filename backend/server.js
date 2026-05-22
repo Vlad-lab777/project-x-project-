@@ -6,7 +6,11 @@ const { neon } = require('@neondatabase/serverless')
 const app = express()
 const sql = neon(process.env.DATABASE_URL)
 
-app.use(cors())
+const allowedOrigins = process.env.ALLOWED_ORIGIN
+  ? process.env.ALLOWED_ORIGIN.split(',').map((o) => o.trim())
+  : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176', 'http://localhost:5177']
+
+app.use(cors({ origin: allowedOrigins }))
 app.use(express.json({ limit: '10mb' }))
 
 // ── DB SETUP ──────────────────────────────────────────────────────────────────
