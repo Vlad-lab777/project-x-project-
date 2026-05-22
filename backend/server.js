@@ -165,8 +165,8 @@ app.post('/api/bookings', async (req, res) => {
     const totalPrice = svcs.reduce((sum, s) => sum + s.price, 0)
 
     const [row] = await sql`
-      INSERT INTO bookings (service_ids, price, name, phone, email, car_brand, car_model, car_year, date, time, notes)
-      VALUES (${serviceIds}, ${totalPrice}, ${name}, ${phone}, ${email ?? null}, ${carBrand}, ${carModel}, ${carYear ? Number(carYear) : null}, ${date}, ${time}, ${notes ?? null})
+      INSERT INTO bookings (service_id, service_ids, price, name, phone, email, car_brand, car_model, car_year, date, time, notes)
+      VALUES (${serviceIds[0]}, ${serviceIds}, ${totalPrice}, ${name}, ${phone}, ${email ?? null}, ${carBrand}, ${carModel}, ${carYear ? Number(carYear) : null}, ${date}, ${time}, ${notes ?? null})
       RETURNING id
     `
     res.status(201).json({ id: row.id })
