@@ -54,10 +54,6 @@ export function BookingPage() {
     api.getServices().then(setServices).catch(console.error)
   }, [])
 
-  useEffect(() => {
-    if (preselectedId) setForm((f) => ({ ...f, serviceIds: [preselectedId] }))
-  }, [preselectedId])
-
   const selectedServices = services.filter((s) => form.serviceIds.includes(s.id))
   const totalPrice    = selectedServices.reduce((sum, s) => sum + s.price, 0)
   const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0)
