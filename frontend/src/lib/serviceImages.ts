@@ -8,6 +8,6 @@ export const SERVICE_IMAGES: Record<string, string> = {
   s4: `${P}/20051453/pexels-photo-20051453.jpeg${Q}`, // ceramic coating
   s5: `${P}/11456554/pexels-photo-11456554.jpeg${Q}`, // engine
   s6: `${P}/14231684/pexels-photo-14231684.jpeg${Q}`, // premium detailing
-  s7: `${P}/10463764/pexels-photo-10463764.jpeg${Q}`, // nano coating
+  s7: `${P}/19821955/pexels-photo-19821955.jpeg${Q}`, // car headlight close up
   s8: `${P}/5233285/pexels-photo-5233285.jpeg${Q}`,   // seat cleaning
 }
