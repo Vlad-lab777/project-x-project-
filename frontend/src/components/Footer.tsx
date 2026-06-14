@@ -8,11 +8,11 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <img src="/logo-short.png" alt="TSD" className="h-8 w-auto" />
-              <span className="font-bold text-white">DetailPRO</span>
+              <img src="/logo-short.png" alt="TimCar Studio" className="h-8 w-auto" />
+              <span className="font-bold text-white">TimCar Studio</span>
             </div>
             <p className="text-sm text-zinc-500 leading-relaxed">
-              Преміум студія автомобільного детейлінгу.<br />
+              Студія автомобільного детейлінгу в Летичеві.<br />
               Ваше авто заслуговує на найкраще.
             </p>
           </div>
@@ -34,10 +34,10 @@ export function Footer() {
             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Контакти</p>
             <ul className="space-y-3">
               {[
-                { icon: '📞', text: '+38 (067) 000-00-00' },
-                { icon: '📧', text: 'info@detailpro.ua' },
-                { icon: '📍', text: 'вул. Автомобільна, 1, Київ' },
-                { icon: '🕐', text: 'Пн–Сб: 8:00 – 20:00' },
+                { icon: '📞', text: '+380 67 320 89 60' },
+                { icon: '✈️', text: 'Telegram: @T1mpah' },
+                { icon: '📍', text: 'Летичів, стара газ контора' },
+                { icon: '🕐', text: 'Пн–Сб: 9:00 – 19:00' },
               ].map(({ icon, text }) => (
                 <li key={text} className="flex items-center gap-2.5 text-sm text-zinc-500">
                   <span>{icon}</span>
@@ -49,8 +49,12 @@ export function Footer() {
         </div>
 
         <div className="pt-6 border-t border-zinc-800/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-zinc-700">© 2026 DetailPRO. Всі права захищено.</p>
-          <p className="text-xs text-zinc-700">Преміум детейлінг у вашому місті</p>
+          <p className="text-xs text-zinc-700">© 2026 TimCar Studio. Всі права захищено.</p>
+          <div className="flex items-center gap-4">
+            <a href="https://www.instagram.com/timcar.detailing_letychiv" target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-500 hover:text-white transition-colors">Instagram</a>
+            <a href="https://www.facebook.com/share/1HKv3NUm4g/" target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-500 hover:text-white transition-colors">Facebook</a>
+            <a href="https://t.me/T1mpah" target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-500 hover:text-white transition-colors">Telegram</a>
+          </div>
         </div>
       </div>
     </footer>

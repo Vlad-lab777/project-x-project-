@@ -27,6 +27,7 @@ export interface Service {
   description: string
   duration: number
   price: number
+  priceLabel: string
   gradient: string
   icon: string
   active: boolean

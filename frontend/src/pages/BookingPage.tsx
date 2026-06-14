@@ -132,7 +132,7 @@ export function BookingPage() {
             <Row label="Телефон" value={form.phone} />
             <Row label="Авто"    value={`${form.carBrand} ${form.carModel}${form.carYear ? ` (${form.carYear})` : ''}`} />
             <Row label="Тривалість" value={formatDuration(totalDuration)} />
-            <Row label="Вартість" value={`₴${totalPrice.toLocaleString()}`} />
+            <Row label="Вартість" value={`від ${totalPrice}$`} />
           </div>
           <button
             onClick={() => { setForm({ ...EMPTY, serviceIds: preselectedId ? [preselectedId] : [] }); setSubmitted(false) }}
@@ -183,7 +183,7 @@ export function BookingPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-white truncate">{s.name}</p>
-                        <p className="text-xs text-zinc-500">{formatDuration(s.duration)} · ₴{s.price.toLocaleString()}</p>
+                        <p className="text-xs text-zinc-500">{formatDuration(s.duration)} · {s.priceLabel}</p>
                       </div>
                       <div className={`ml-auto w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
                         selected ? 'bg-blue-500 border-blue-500' : 'border-zinc-600'
@@ -296,13 +296,13 @@ export function BookingPage() {
                         <p className="text-xs text-zinc-400">{formatDuration(s.duration)}</p>
                       </div>
                     </div>
-                    <p className="text-sm font-semibold text-white shrink-0">₴{s.price.toLocaleString()}</p>
+                    <p className="text-sm font-semibold text-white shrink-0">{s.priceLabel}</p>
                   </div>
                 ))}
                 {selectedServices.length > 1 && (
                   <div className="pt-3 border-t border-blue-500/20 flex items-center justify-between">
                     <p className="text-xs text-zinc-400">Разом · {formatDuration(totalDuration)}</p>
-                    <p className="text-xl font-bold text-white">₴{totalPrice.toLocaleString()}</p>
+                    <p className="text-xl font-bold text-white">від {totalPrice}$</p>
                   </div>
                 )}
               </motion.div>

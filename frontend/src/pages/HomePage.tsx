@@ -87,7 +87,7 @@ export function HomePage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       {/* ─── HERO ─── */}
-      <section className="relative lg:min-h-screen flex items-center overflow-hidden">
+      <section className="relative flex items-center overflow-hidden">
         {/* Фонове фото */}
         <div className="absolute inset-0">
           <img
@@ -100,14 +100,14 @@ export function HomePage() {
           <div className="absolute inset-0 bg-blue-950/20" />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-4 pt-28 pb-12 lg:py-32 w-full">
+        <div className="relative max-w-6xl mx-auto px-4 pt-28 pb-12 lg:pt-32 lg:pb-20 w-full">
           <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-12">
 
             {/* Left — text */}
             <div className="flex-1 min-w-0 order-2 lg:order-1">
               <motion.div {...fadeUp(0.1)} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-5">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                Преміум детейлінг студія · Київ
+                Детейлінг студія · Летичів
               </motion.div>
 
               <motion.h1 {...fadeUp(0.2)} className="text-5xl sm:text-6xl font-extrabold text-white leading-tight tracking-tight mb-5">
@@ -188,7 +188,30 @@ export function HomePage() {
                 alt="TIMCAR STUDIO Detailing"
                 className="w-full drop-shadow-[0_0_120px_rgba(59,130,246,0.5)]"
               />
-
+{/* Stats */}
+              <motion.div {...fadeUp(0.5)} className="grid grid-cols-3 gap-3 mt-2">
+                {[
+                  { value: '2', label: 'роки досвіду' },
+                  { value: '300+', label: 'авто оброблено' },
+                  { value: '4.9★', label: 'середній рейтинг' },
+                ].map(({ value, label }) => (
+                  <div key={label} className="text-center bg-white/5 border border-white/10 rounded-xl py-4 px-2 backdrop-blur-sm">
+                    <p className="text-2xl font-extrabold text-white">{value}</p>
+                    <p className="text-[11px] text-zinc-400 leading-tight mt-1">{label}</p>
+                  </div>
+                ))}
+              </motion.div>
+              {/* Social links */}
+              <motion.div {...fadeUp(0.6)} className="flex gap-3 mt-3">
+                <a href="https://www.instagram.com/timcar.detailing_letychiv" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-xl py-3 text-sm font-semibold text-white hover:bg-white/10 backdrop-blur-sm transition-all">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  Instagram
+                </a>
+                <a href="https://t.me/T1mpah" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-xl py-3 text-sm font-semibold text-white hover:bg-white/10 backdrop-blur-sm transition-all">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21.5 4.5 2.5 11.8c-1 .4-1 1.5 0 1.8l4.8 1.5L18 8.2c.4-.3.9.1.5.4l-8.6 7.8v.1l-.3 4.2c.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.5c.3-1.2-.5-1.8-1.3-1.5z"/></svg>
+                  Telegram
+                </a>
+              </motion.div>
             </motion.div>
 
           </div>
@@ -244,7 +267,7 @@ export function HomePage() {
                   <p className="text-xs text-zinc-500 leading-relaxed mb-4 line-clamp-2">{s.description}</p>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-lg font-bold text-white">₴{s.price.toLocaleString()}</p>
+                      <p className="text-lg font-bold text-white">{s.priceLabel}</p>
                       <p className="text-[11px] text-zinc-600">{formatDuration(s.duration)}</p>
                     </div>
                     <button onClick={() => navigate('/booking', { state: { serviceId: s.id } })} className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-shadow">

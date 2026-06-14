@@ -135,7 +135,7 @@ export function ReviewsPage() {
                 <p className="text-sm text-zinc-400 leading-relaxed">{r.text}</p>
                 {r.reply && (
                   <div className="mt-4 pl-4 border-l-2 border-blue-500/40 bg-blue-500/5 rounded-r-xl py-3 pr-3">
-                    <p className="text-xs font-semibold text-blue-400 mb-1">Відповідь студії DetailPRO</p>
+                    <p className="text-xs font-semibold text-blue-400 mb-1">Відповідь студії TimCar Studio</p>
                     <p className="text-xs text-zinc-400 leading-relaxed">{r.reply}</p>
                   </div>
                 )}

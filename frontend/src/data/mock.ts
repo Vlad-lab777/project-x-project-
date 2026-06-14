@@ -22,42 +22,42 @@ export const SERVICES: Service[] = [
   {
     id: 's1', name: 'Комплексна мийка', category: 'wash',
     description: 'Зовнішня мийка кузова, чищення дисків та арок, сушіння та поліролення скла.',
-    duration: 90, price: 800, gradient: 'from-sky-500 to-cyan-500', icon: '💧', active: true,
+    duration: 90, price: 20, priceLabel: '20$', gradient: 'from-sky-500 to-cyan-500', icon: '💧', active: true,
   },
   {
     id: 's2', name: 'Хімчистка салону', category: 'dry-cleaning',
     description: 'Глибоке очищення всіх поверхонь салону: сидінь, килимів, стелі, дверних карт.',
-    duration: 240, price: 3500, gradient: 'from-purple-500 to-violet-600', icon: '🧹', active: true,
+    duration: 240, price: 80, priceLabel: '80-150$', gradient: 'from-purple-500 to-violet-600', icon: '🧹', active: true,
   },
   {
     id: 's3', name: 'Полірування кузова', category: 'polish',
     description: 'Усунення подряпин, вихрів та оксидації. Відновлення блиску лакофарбового покриття.',
-    duration: 480, price: 6000, gradient: 'from-amber-400 to-orange-500', icon: '✨', active: true,
+    duration: 480, price: 170, priceLabel: '170-250$', gradient: 'from-amber-400 to-orange-500', icon: '✨', active: true,
   },
   {
     id: 's4', name: 'Керамічне покриття', category: 'ceramic',
     description: 'Нанесення керамічного захисного покриття. Захист від хімічних впливів і UV-випромінювання.',
-    duration: 600, price: 15000, gradient: 'from-blue-500 to-indigo-600', icon: '🔷', active: true,
+    duration: 600, price: 350, priceLabel: '350$', gradient: 'from-blue-500 to-indigo-600', icon: '🔷', active: true,
   },
   {
     id: 's5', name: 'Мийка двигуна', category: 'wash',
     description: 'Безпечне очищення підкапотного простору з використанням спеціальних засобів.',
-    duration: 60, price: 600, gradient: 'from-teal-500 to-emerald-500', icon: '⚙️', active: true,
+    duration: 60, price: 20, priceLabel: '20$', gradient: 'from-teal-500 to-emerald-500', icon: '⚙️', active: true,
   },
   {
     id: 's6', name: 'Преміум детейлінг', category: 'detailing',
     description: 'Повний цикл відновлення та захисту: мийка, полірування, керамічне покриття, хімчистка.',
-    duration: 720, price: 22000, gradient: 'from-rose-500 to-pink-600', icon: '🏆', active: true,
+    duration: 720, price: 400, priceLabel: '400$', gradient: 'from-rose-500 to-pink-600', icon: '🏆', active: true,
   },
   {
-    id: 's7', name: 'Нанощитне покриття', category: 'ceramic',
-    description: 'Рідке скло + гідрофобний шар. Стійкість до подряпин, бруду та хімікатів.',
-    duration: 480, price: 12000, gradient: 'from-indigo-500 to-blue-600', icon: '🛡️', active: true,
+    id: 's7', name: 'Відновлення оптики', category: 'polish',
+    description: 'Полірування та відновлення фар: усунення помутніння, жовтизни та подряпин. Повертаємо прозорість і яскравість світла.',
+    duration: 120, price: 30, priceLabel: '30$', gradient: 'from-indigo-500 to-blue-600', icon: '💡', active: true,
   },
   {
     id: 's8', name: 'Хімчистка сидінь', category: 'dry-cleaning',
     description: 'Видалення плям, запахів та бактерій. Шкіра, тканина, алькантара.',
-    duration: 180, price: 2500, gradient: 'from-fuchsia-500 to-purple-600', icon: '🪑', active: true,
+    duration: 180, price: 50, priceLabel: '50$', gradient: 'from-fuchsia-500 to-purple-600', icon: '🪑', active: true,
   },
 ]
 
@@ -86,6 +86,6 @@ export const REVIEWS: Review[] = [
   { id: 'r4', clientId: 'c4', bookingId: 'b4',  rating: 5, text: 'Полірування кузова — top! Audi виглядає краще, ніж коли я її купив. Майстри — справжні профі. Вже записався на керамічне покриття.',                         createdAt: '2026-05-05T09:00:00Z' },
   { id: 'r5', clientId: 'c5', bookingId: 'b14', rating: 5, text: 'Преміум детейлінг — це інший рівень. Порш виглядає як зі салону. Кожна деталь опрацьована бездоганно. Однозначно найкраща студія в місті!',                   createdAt: '2026-04-22T15:00:00Z', reply: 'Ігорю, дуже приємно це чути! Завжди раді бачити вас у нас.' },
   { id: 'r6', clientId: 'c6', bookingId: 'b12', rating: 4, text: 'Перший раз у цій студії — дуже приємне враження. Ввічливий персонал, чисто, акуратно. XC90 блищить. Повернусь на хімчистку.',                                 createdAt: '2026-05-05T16:00:00Z' },
-  { id: 'r7', clientId: 'c2', bookingId: 'b8',  rating: 5, text: 'Нанощитне покриття — чудово! Вода скочується краплями, бруд не прилипає. Майстри пояснили весь процес. Дуже професійний підхід.',                              createdAt: '2026-05-09T12:00:00Z' },
+  { id: 'r7', clientId: 'c2', bookingId: 'b8',  rating: 5, text: 'Відновлення оптики — супер! Фари були мутні й жовті, стали як нові, світло яскравіше. Майстри пояснили весь процес. Дуже професійний підхід.',                              createdAt: '2026-05-09T12:00:00Z' },
   { id: 'r8', clientId: 'c1', bookingId: 'b7',  rating: 3, text: 'Мийка двигуна зроблена добре, але хотілось би більш детального підходу до важкодоступних місць. Загалом задоволений, але є куди рости.',                         createdAt: '2026-05-08T10:00:00Z', reply: 'Дякуємо за чесний відгук! Врахуємо ваші побажання.' },
 ]

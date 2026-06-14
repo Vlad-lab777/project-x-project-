@@ -113,7 +113,7 @@ export function ServicesPage() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between pt-3 border-t border-zinc-800">
-                    <p className="text-lg font-bold text-white">₴{s.price.toLocaleString()}</p>
+                    <p className="text-lg font-bold text-white">{s.priceLabel}</p>
                     <button
                       onClick={() => navigate('/booking', { state: { serviceId: s.id } })}
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-semibold shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 transition-shadow"

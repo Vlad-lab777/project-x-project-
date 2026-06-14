@@ -24,8 +24,8 @@ export function Navbar() {
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-6">
         {/* Logo */}
         <NavLink to="/" className="flex items-center gap-2.5 shrink-0">
-          <img src="/logo-short.png" alt="TSD" className="h-8 w-auto" />
-          <span className="font-bold text-sm text-white tracking-tight">DetailPRO</span>
+          <img src="/logo-short.png" alt="TimCar Studio" className="h-8 w-auto" />
+          <span className="font-bold text-sm text-white tracking-tight">TimCar Studio</span>
         </NavLink>
 
         {/* Desktop nav */}
