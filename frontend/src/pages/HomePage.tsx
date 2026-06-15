@@ -186,10 +186,10 @@ export function HomePage() {
               <img
                 src="/logo-main.png"
                 alt="TIMCAR STUDIO Detailing"
-                className="w-full mt-[113px] drop-shadow-[0_0_120px_rgba(59,130,246,0.5)]"
+                className="w-full mt-[75px] drop-shadow-[0_0_120px_rgba(59,130,246,0.5)]"
               />
 {/* Stats */}
-              <motion.div {...fadeUp(0.5)} className="grid grid-cols-3 gap-3 mt-[100px]">
+              <motion.div {...fadeUp(0.5)} className="grid grid-cols-3 gap-3 mt-[138px]">
                 {[
                   { value: '2', label: 'роки досвіду' },
                   { value: '300+', label: 'авто оброблено' },

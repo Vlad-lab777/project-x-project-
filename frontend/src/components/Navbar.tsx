@@ -20,7 +20,10 @@ export function Navbar() {
   }, [])
 
   return (
-    <header className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/60 shadow-xl' : 'bg-transparent'}`}>
+    <header
+      style={{ backgroundColor: scrolled ? 'rgba(9,9,11,0.40)' : 'rgba(9,9,11,0.20)' }}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 backdrop-blur-md ${scrolled ? 'border-b border-zinc-800/60 shadow-xl' : 'border-b border-white/5'}`}
+    >
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-6">
         {/* Logo */}
         <NavLink to="/" className="flex items-center gap-2.5 shrink-0">
