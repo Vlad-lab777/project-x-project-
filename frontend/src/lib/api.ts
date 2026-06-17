@@ -1,11 +1,4 @@
-// ⚙️ Дані беруться локально з src/data/mock.ts — бекенд не потрібен.
-// Форма запису формує повідомлення й відкриває Telegram студії.
-
 import { SERVICES, REVIEWS, CLIENTS } from '../data/mock'
-
-// 👇 ПОМІНЯЙ ЦЕ на Telegram-юзернейм брата (без @).
-// Напр. якщо його акаунт t.me/timcar_detailing — пиши 'timcar_detailing'.
-export const TELEGRAM_USERNAME = 'T1mpah'
 
 export interface ApiService {
   id: string
@@ -51,45 +44,8 @@ export interface BookingPayload {
   notes?: string
 }
 
-// Невелика затримка, щоб скелетони-завантаження встигли показатись (як було з сервером).
 const tick = <T>(value: T): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), 150))
-
-function buildTelegramMessage(data: BookingPayload): string {
-  const serviceNames = data.serviceIds
-    .map((id) => SERVICES.find((s) => s.id === id)?.name)
-    .filter(Boolean)
-    .join(', ')
-
-  const totalPrice = data.serviceIds.reduce((sum, id) => {
-    const svc = SERVICES.find((s) => s.id === id)
-    return sum + (svc?.price ?? 0)
-  }, 0)
-
-  const dateUa = data.date
-    ? new Date(data.date).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
-    : '—'
-
-  const car = `${data.carBrand} ${data.carModel}${data.carYear ? ` (${data.carYear})` : ''}`
-
-  const lines = [
-    '🚗 Нова заявка з сайту',
-    '',
-    `🧰 Послуги: ${serviceNames || '—'}`,
-    `📅 Дата: ${dateUa}`,
-    `🕐 Час: ${data.time || '—'}`,
-    '',
-    `👤 Клієнт: ${data.name}`,
-    `📞 Телефон: ${data.phone}`,
-    data.email ? `📧 Email: ${data.email}` : '',
-    `🚙 Авто: ${car}`,
-    data.notes ? `📝 Побажання: ${data.notes}` : '',
-    '',
-    `💰 Орієнтовна сума: від ${totalPrice}$`,
-  ]
-
-  return lines.filter((l) => l !== '').join('\n')
-}
 
 export const api = {
   getServices: () => tick<ApiService[]>(SERVICES as ApiService[]),
@@ -121,13 +77,16 @@ export const api = {
     })
   },
 
-  // Замість сервера: відкриваємо Telegram студії з готовим текстом заявки.
-  createBooking: (data: BookingPayload) => {
-    const text = buildTelegramMessage(data)
-    const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(text)}`
-    if (typeof window !== 'undefined') {
-      window.open(url, '_blank')
-    }
-    return tick<{ id: number }>({ id: Date.now() })
+  createBooking: async (data: BookingPayload) => {
+    const serviceNames = data.serviceIds
+      .map((id) => SERVICES.find((s) => s.id === id)?.name)
+      .filter(Boolean)
+    const res = await fetch('/api/send-telegram', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, serviceNames }),
+    })
+    if (!res.ok) throw new Error('Failed to send booking')
+    return res.json() as Promise<{ ok: boolean }>
   },
 }

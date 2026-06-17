@@ -47,8 +47,9 @@ export function BookingPage() {
   const [services, setServices] = useState<ApiService[]>([])
   const [form,      setForm]     = useState<FormData>({ ...EMPTY, serviceIds: preselectedId ? [preselectedId] : [] })
   const [errors,    setErrors]   = useState<FieldErrors>({})
-  const [submitting,setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [submitting,  setSubmitting]  = useState(false)
+  const [submitted,   setSubmitted]   = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   useEffect(() => {
     api.getServices().then(setServices).catch(console.error)
@@ -91,6 +92,7 @@ export function BookingPage() {
     evt.preventDefault()
     if (!validate()) return
     setSubmitting(true)
+    setSubmitError(null)
     try {
       await api.createBooking({
         serviceIds: form.serviceIds,
@@ -106,7 +108,7 @@ export function BookingPage() {
       })
       setSubmitted(true)
     } catch {
-      setErrors({ name: 'Сталась помилка. Спробуйте ще раз.' })
+      setSubmitError('Не вдалось відправити заявку. Перевірте зʼєднання і спробуйте ще раз.')
     } finally {
       setSubmitting(false)
     }
@@ -316,6 +318,10 @@ export function BookingPage() {
           >
             {submitting ? 'Відправляємо...' : 'Підтвердити запис'}
           </button>
+
+          {submitError && (
+            <p className="text-sm text-red-400 text-center -mt-4">{submitError}</p>
+          )}
         </form>
       </div>
     </div>
